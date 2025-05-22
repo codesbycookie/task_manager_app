@@ -1,0 +1,76 @@
+/* General container styling */
+.container-fluid {
+  padding: 20px;
+}
+
+/* Title Styling */
+h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* User Card Styling */
+.user-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.user-card {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  width: 120px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.user-card:hover, .user-card.active {
+  background: #007bff;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Month Picker */
+.month-picker {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.month-picker input {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Table Styling */
+.table-container {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.ag-theme-alpine {
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Task Cell Styling */
+.task-cell {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.task-cell strong {
+  color: #333;
+}
+
+.task-cell small {
+  color: #777;
+}

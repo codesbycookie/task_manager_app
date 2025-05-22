@@ -1,0 +1,64 @@
+/* Full-page container */
+.login-container {
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+}
+
+/* Card styling */
+.login-card {
+  width: 400px;
+  border-radius: 10px;
+  background: #fff;
+  transition: transform 0.2s ease-in-out;
+}
+
+.login-card:hover {
+  transform: scale(1.02);
+}
+
+/* Form control improvements */
+.form-control {
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Register text link */
+.register-link {
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+
+/* Smooth transition for register options */
+.register-options {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+  transition: opacity 0.3s ease-in-out, height 0.3s ease-in-out;
+}
+
+.register-options.show {
+  opacity: 1;
+  height: auto;
+}
+
+/* Button styles */
+.btn-primary, .btn-outline-primary, .btn-outline-danger {
+  transition: background 0.3s ease-in-out;
+}
+
+.btn-primary:hover {
+  background: #004aad;
+}
+
+.btn-outline-primary:hover {
+  background: #0d6efd;
+  color: white;
+}
+
+.btn-outline-danger:hover {
+  background: #dc3545;
+  color: white;
+}

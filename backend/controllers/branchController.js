@@ -41,6 +41,11 @@ const editBranch = async (req, res) => {
     const { branchId } = req.params;
     const updateData = req.body;
 
+    const existingBranch = await Branch.findOne({ name: updateData.name, _id: { $ne: branchId } });
+    if (existingBranch) {
+      return res.status(409).json({ message: 'Branch with this name already exists.' });
+    }
+
     const updatedBranch = await Branch.findByIdAndUpdate(branchId, updateData, {
       new: true,
       runValidators: true
@@ -68,6 +73,10 @@ const deleteBranch = async (req, res) => {
       return res.status(404).json({ message: 'Branch not found.' });
     }
 
+    if (deletedBranch.members_count > 0) {
+      return res.status(400).json({ message: 'Cannot delete branch with members.' });
+    }
+
     res.status(200).json({
       message: 'Branch deleted successfully.',
       branch: deletedBranch
@@ -88,8 +97,8 @@ const getBranches = async (req, res) => {
 
 
 module.exports = {
-    addBranch,
-    editBranch,
-    deleteBranch,
-    getBranches
+  addBranch,
+  editBranch,
+  deleteBranch,
+  getBranches
 }

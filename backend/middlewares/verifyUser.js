@@ -8,6 +8,8 @@ module.exports = async function verifyUserAndTask(req, res, next) {
 
     const userId = req.params.userId || req.body.userId;
 
+    console.log('userid middleware',userId)
+
     if (!userId) {
       return res.status(400).json({ message: 'Missing userId or taskId' });
     }
@@ -23,7 +25,7 @@ module.exports = async function verifyUserAndTask(req, res, next) {
 
     next();
   } catch (err) {
-    console.error('User/Task verification failed:', err);
+    console.error('User verification failed:', err);
     return res.status(500).json({ message: 'Internal server error' });
   }
 }

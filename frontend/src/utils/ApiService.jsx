@@ -1,18 +1,25 @@
 import axios from 'axios';
 
-const getRequest = async (url, params = {}) => {
+// Generic GET request
+const getRequest = async (url, params = {}, headers = {}) => {
   try {
-    const response = await axios.get(url, { params });
-    return response.data; 
+    const response = await axios.get(url, {
+      params,
+      headers,
+    });
+    return response.data;
   } catch (error) {
     console.error('GET Request Error:', error);
     throw error;
   }
 };
 
-const postRequest = async (url, data = {}) => {
+// Generic POST request
+const postRequest = async (url, data = {}, headers = {}) => {
   try {
-    const response = await axios.post(url, data);
+    const response = await axios.post(url, data, {
+      headers,
+    });
     return response.data;
   } catch (error) {
     console.error('POST Request Error:', error);
@@ -20,10 +27,12 @@ const postRequest = async (url, data = {}) => {
   }
 };
 
-// PUT Function
-const putRequest = async (url, data = {}) => {
+// PUT request
+const putRequest = async (url, data = {}, headers = {}) => {
   try {
-    const response = await axios.put(url, data);
+    const response = await axios.put(url, data, {
+      headers,
+    });
     return response.data;
   } catch (error) {
     console.error('PUT Request Error:', error);
@@ -31,10 +40,13 @@ const putRequest = async (url, data = {}) => {
   }
 };
 
-// DELETE Function
-const deleteRequest = async (url, params = {}) => {
+// DELETE request
+const deleteRequest = async (url, params = {}, headers = {}) => {
   try {
-    const response = await axios.delete(url, { params });
+    const response = await axios.delete(url, {
+      params,
+      headers,
+    });
     return response.data;
   } catch (error) {
     console.error('DELETE Request Error:', error);

@@ -14,12 +14,15 @@ const task_schema = new mongoose.Schema({
         type: String,
         enum: ['once', 'daily', 'weekly', 'monthly']
     },
-     days: {
+    days: {
         type: [String],
         default: []
     }, 
+    dates : [{
+        type: Number
+    }],
     date: {
-        type: String,
+        type: Date,
     },
     templateId: {
         type: String,

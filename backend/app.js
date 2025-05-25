@@ -12,6 +12,7 @@ dotenv.config();
 const taskRoutes = require('./routes/taskRoutes')
 const userRoutes = require('./routes/userRoutes');
 const branchRoutes = require('./routes/branchRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
@@ -39,7 +40,7 @@ app.get('/', (req, res) => {
 app.use('/api/tasks', taskRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/branch', branchRoutes);
-
+app.use('/api/admin', adminRoutes)
 
 app.listen(3000, () => {
   console.log('Listening to the port 3000');

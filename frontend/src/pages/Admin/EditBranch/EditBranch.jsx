@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useApi } from '../../../context/ApiContext';
-
+import './EditBranch.css'
 export default function EditBranch() {
   const { state } = useLocation();
   const {editBranch} = useApi();

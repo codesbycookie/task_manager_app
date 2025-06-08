@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import {Outlet} from 'react-router-dom';
-import { useApi } from '../../../context/ApiContext';
+import React, { useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
+import { useApi } from "../../../context/ApiContext";
+import "./Navbar.css";
 
 const UserNavbar = () => {
   const [dateTime, setDateTime] = useState(new Date());
-
-
-    const {logout} = useApi();
-  
+  const { logout } = useApi();
 
   useEffect(() => {
     const interval = setInterval(() => setDateTime(new Date()), 1000);
@@ -20,21 +17,28 @@ const UserNavbar = () => {
 
   return (
     <>
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-      <a className="navbar-brand" href="/">User TaskManager</a>
+      <nav className="navbar navbar-expand-lg custom-navbar px-4">
+        <a className="navbar-brand fw-bold" href="/">
+          Admin TaskManager
+        </a>
 
-      <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span className="navbar-toggler-icon"></span>
-      </button>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
 
-      <div className="collapse navbar-collapse" id="navbarNav">
-        <ul className="navbar-nav me-auto">
-          <li className="nav-item">
-            <span className="nav-link text-light">
-              📅 {formattedDate} | ⏰ {formattedTime}
-            </span>
-          </li>
-          <li className="nav-item">
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav me-auto gap-2">
+            <li className="nav-item">
+              <span className="nav-link datetime">
+                📅 {formattedDate} | ⏰ {formattedTime}
+              </span>
+            </li>
+            <li className="nav-item">
             <a className="nav-link" href="/user/sheets">My Tasks</a>
           </li>
           <li className="nav-item">
@@ -46,13 +50,16 @@ const UserNavbar = () => {
           <li className="nav-item">
             <a className="nav-link" href="/user">Profile</a>
           </li>
-          <li className="nav-item">
-            <a className="nav-link" onClick={logout}>Logout</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-    <Outlet/>
+
+            <li className="nav-item">
+              <span className="nav-link logout" onClick={logout}>
+                Logout
+              </span>
+            </li>
+          </ul>
+        </div>
+      </nav>
+      <Outlet />
     </>
   );
 };

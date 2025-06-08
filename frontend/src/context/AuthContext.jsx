@@ -35,6 +35,7 @@ export function AuthProvider({ children }) {
       setLoading(false);
     }
   };
+
   
   const loginFirebase = async (email, password) => {
     setLoading(true); 

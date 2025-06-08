@@ -17,7 +17,6 @@ const adminLogin = async(req, res) => {
         const tasks = await TaskStatus.find({})
         const branches = await Branch.find({});
 
-        console.log(admin)
         
         res.status(200).json({
             message: 'Admin logged in successfully.',

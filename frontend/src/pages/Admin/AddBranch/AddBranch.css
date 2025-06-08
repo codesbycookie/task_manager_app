@@ -1,0 +1,131 @@
+
+
+/* Center container vertically & horizontally */
+.container {
+  margin: 3rem auto;
+  padding: 2.5rem 2rem;
+  background: white;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Heading */
+h2 {
+  font-weight: 700;
+  font-size: 2.25rem;
+  color: #8dc540; /* green */
+  text-align: center;
+  margin-bottom: 1.8rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+/* Form */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+/* Labels */
+label.form-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #555;
+}
+
+/* Input & textarea styles */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+textarea {
+  width: 100%;
+  padding: 0.75rem 1.2rem;
+  border: 2px solid #8dc540; /* green border */
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  resize: vertical;
+  min-height: 80px;
+  color: #333;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+textarea:focus {
+  outline: none;
+  border-color: #fac116; /* yellow */
+  box-shadow: 0 0 8px #fac116aa;
+}
+
+/* Radio button container */
+.form-check {
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+/* Radio buttons */
+.form-check-input {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #8dc540; /* green */
+}
+
+/* Radio labels */
+.form-check-label {
+  cursor: pointer;
+  user-select: none;
+  font-weight: 500;
+  color: #444;
+}
+
+/* Submit button */
+button.btn-primary {
+  padding: 0.9rem 1.3rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  background-color: #8dc540; /* green */
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 5px 10px #8dc540aa;
+}
+
+button.btn-primary:hover:not(:disabled) {
+  background-color: #fac116; /* yellow */
+  box-shadow: 0 7px 14px #fac116cc;
+  color: #333;
+}
+
+button.btn-primary:disabled {
+  background-color: #c5d8a4;
+  cursor: not-allowed;
+  color: #777;
+  box-shadow: none;
+}
+
+/* No users message */
+.mb-3 > p {
+  color: #7a7a7a;
+  font-style: italic;
+  font-size: 0.95rem;
+  text-align: center;
+  margin-top: -0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .container {
+    margin: 1.5rem 1rem;
+    padding: 2rem 1.5rem;
+  }
+}

@@ -1,39 +1,25 @@
 import React from 'react';
 import { useApi } from '../../../context/ApiContext';
+import './Profile.css';
 
 export default function UserProfile() {
-
-  const {user} = useApi();
+  const { user } = useApi();
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>User Profile</h2>
-      <div style={styles.row}><strong>Name:</strong> {user.name}</div>
-      <div style={styles.row}><strong>Email:</strong> {user.email}</div>
-      <div style={styles.row}><strong>Phone:</strong> {user.phone_number}</div>
-      <div style={styles.row}><strong>Address:</strong> {user.address}</div>
-      <div style={styles.row}><strong>Branch ID:</strong> {user.branch}</div>
-      <div style={styles.row}><strong>UID:</strong> {user.uid}</div>
-      <div style={styles.row}><strong>Created:</strong> {new Date(user.createdAt).toLocaleString()}</div>
-      <div style={styles.row}><strong>Updated:</strong> {new Date(user.updatedAt).toLocaleString()}</div>
+    <div className="user-profile-container">
+      <h2 className="user-profile-heading">User Profile</h2>
+      <table className="user-profile-table">
+        <tbody>
+          <tr><th>Name</th><td>{user.name}</td></tr>
+          <tr><th>Email</th><td>{user.email}</td></tr>
+          <tr><th>Phone</th><td>{user.phone_number}</td></tr>
+          <tr><th>Address</th><td>{user.address}</td></tr>
+          <tr><th>Branch ID</th><td>{user.branch}</td></tr>
+          <tr><th>UID</th><td>{user.uid}</td></tr>
+          <tr><th>Created</th><td>{new Date(user.createdAt).toLocaleString()}</td></tr>
+          <tr><th>Updated</th><td>{new Date(user.updatedAt).toLocaleString()}</td></tr>
+        </tbody>
+      </table>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    padding: '20px',
-    maxWidth: '500px',
-    margin: 'auto',
-    backgroundColor: '#f9f9f9',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)'
-  },
-  heading: {
-    marginBottom: '20px',
-    textAlign: 'center'
-  },
-  row: {
-    marginBottom: '10px'
-  }
-};

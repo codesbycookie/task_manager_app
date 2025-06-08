@@ -1,0 +1,18 @@
+.login-bg {
+  background-color: #ffffff;
+}
+
+.login-btn {
+  background-color: #8dc540;
+  color: white;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #7bb138;
+}
+
+.custom-switch {
+  accent-color: #fac116;
+}

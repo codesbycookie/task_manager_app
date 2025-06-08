@@ -1,28 +1,22 @@
-import React, {  useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { useApi } from "../../../context/ApiContext";
+import "./Users.css";
 
 export default function Users() {
-  const {users, deleteUser, fetchUsers} = useApi();
+  const { users, deleteUser } = useApi();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
-
-  console.log(users)
-
-
 
   const confirmDelete = (user) => {
     setUserToDelete(user);
     setShowDeleteModal(true);
   };
 
-
-
-
   const handleDelete = async () => {
     if (!userToDelete) return;
     try {
-      deleteUser(userToDelete._id)
+      deleteUser(userToDelete._id);
       setUserToDelete(null);
       setShowDeleteModal(false);
     } catch (err) {
@@ -30,13 +24,9 @@ export default function Users() {
     }
   };
 
-
-
-
-
   return (
     <div className="container mt-5">
-      <h2 className="mb-4">All Users</h2>
+      <h2 className="mb-4 text-center text-green">All Users</h2>
       <div className="row">
         {users.map((user, index) => (
           <div className="col-md-4 mb-4" key={index}>
@@ -47,8 +37,8 @@ export default function Users() {
                 <p className="card-text"><strong>Branch:</strong> {user.branch ? user.branch.name : 'Branch may be deleted'}</p>
                 <p className="card-text"><strong>Phone:</strong> {user.phone_number}</p>
                 <p className="card-text"><strong>Address:</strong> {user.address}</p>
-                <div className="d-flex justify-content-between">
-                  <a className="btn btn-primary" href={`/admin/users/sheets/${user._id}`}>
+                <div className="d-flex justify-content-between mt-3">
+                  <a className="btn btn-green" href={`/admin/users/sheets/${user._id}`}>
                     View Sheet
                   </a>
                   <button className="btn btn-danger" onClick={() => confirmDelete(user)}>

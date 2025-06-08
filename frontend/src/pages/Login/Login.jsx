@@ -1,17 +1,35 @@
 import React, { useState } from "react";
 import { useApi } from "../../context/ApiContext";
+import "./Login.css"; // minimal override
 
 export default function Login() {
   const [isAdmin, setIsAdmin] = useState(false);
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({});
   const { login } = useApi();
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!formData.password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleLogin = (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     try {
       const finalized_formdata = {
         email: formData.email.trim(),
@@ -22,10 +40,7 @@ export default function Login() {
     } catch (err) {
       console.log(err);
     } finally {
-      setFormData({
-        email: "",
-        password: "",
-      });
+      setFormData({ email: "", password: "" });
     }
   };
 
@@ -35,17 +50,13 @@ export default function Login() {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
-      <div
-        className="card p-4 shadow-sm"
-        style={{ width: "100%", maxWidth: "400px" }}
-      >
+    <div className="container-fluid d-flex justify-content-center align-items-center vh-100 login-bg">
+      <div className="card shadow p-4" style={{ maxWidth: "400px", width: "100%" }}>
         <h3 className="text-center mb-4">Login</h3>
 
-        {/* Admin/User Toggle */}
-        <div className="form-check form-switch mb-4 text-center">
+        <div className="form-check form-switch d-flex justify-content-center mb-3">
           <input
-            className="form-check-input"
+            className="form-check-input custom-switch"
             type="checkbox"
             id="roleSwitch"
             checked={isAdmin}
@@ -55,34 +66,39 @@ export default function Login() {
             {isAdmin ? "Logging in as Admin" : "Logging in as User"}
           </label>
         </div>
-        <form onSubmit={(e) => handleLogin(e)}>
+
+        <form onSubmit={handleLogin}>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">
               Email address
             </label>
             <input
               type="email"
-              className="form-control"
+              className={`form-control ${errors.email ? "is-invalid" : ""}`}
               id="email"
-              onChange={(e) => handleChange(e)}
               value={formData.email}
+              onChange={handleChange}
               placeholder="name@example.com"
             />
+            {errors.email && <div className="text-danger small">{errors.email}</div>}
           </div>
+
           <div className="mb-3">
             <label htmlFor="password" className="form-label">
               Password
             </label>
             <input
               type="password"
-              className="form-control"
+              className={`form-control ${errors.password ? "is-invalid" : ""}`}
               id="password"
-              onChange={(e) => handleChange(e)}
               value={formData.password}
+              onChange={handleChange}
               placeholder="••••••••"
             />
+            {errors.password && <div className="text-danger small">{errors.password}</div>}
           </div>
-          <button type="submit" className="btn btn-primary w-100">
+
+          <button type="submit" className="btn login-btn w-100 mt-3">
             Login
           </button>
         </form>

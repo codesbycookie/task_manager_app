@@ -1,0 +1,60 @@
+
+
+/* Card hover effect */
+.card:hover {
+  box-shadow: 0 0 15px rgba(0, 123, 255, 0.4);
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+/* Card body padding */
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Buttons spacing */
+.d-flex.justify-content-end > button {
+  min-width: 90px;
+}
+
+/* Modal content custom */
+.modal-content {
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+/* Modal title font */
+.modal-title {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+/* Modal body font */
+.modal-body p {
+  font-size: 1rem;
+  color: #333;
+}
+
+/* Primary button override for hover */
+.btn-primary:hover {
+  background-color: #004085;
+  border-color: #003769;
+}
+
+/* Danger button override for hover */
+.btn-danger:hover {
+  background-color: #bd2130;
+  border-color: #b21f2d;
+}
+
+
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .d-flex.justify-content-end {
+    flex-direction: column;
+  }
+  .d-flex.justify-content-end > button {
+    margin-bottom: 0.5rem;
+    width: 100%;
+  }
+}

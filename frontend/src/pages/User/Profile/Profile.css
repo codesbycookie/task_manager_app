@@ -1,0 +1,37 @@
+.user-profile-container {
+  padding: 30px;
+  max-width: 1000px;
+  margin: 50px auto;
+  border-radius: 10px;
+}
+
+.user-profile-heading {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 30px;
+  color:   #8dc540;
+;
+}
+
+.user-profile-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 18px;
+}
+
+.user-profile-table th,
+.user-profile-table td {
+  padding: 14px 20px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.user-profile-table th {
+  width: 35%;
+  font-weight: bold;
+  color: #8dc540;
+}
+
+.user-profile-table td {
+  color: #333;
+}

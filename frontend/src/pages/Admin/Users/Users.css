@@ -1,0 +1,28 @@
+/* Users.css */
+.card-title {
+  color: #8dc540;
+  font-weight: 600;
+}
+
+.card-text strong {
+  color: #fac116;
+}
+
+.btn-green {
+  background-color: #8dc540;
+  color: white;
+  border: none;
+}
+
+.btn-green:hover {
+  background-color: #76ac39;
+}
+
+.btn-danger {
+  background-color: #dc3545 !important;
+  border: none;
+}
+
+.btn-danger:hover {
+  background-color: #c82333 !important;
+}

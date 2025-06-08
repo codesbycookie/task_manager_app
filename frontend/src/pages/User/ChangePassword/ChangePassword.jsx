@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../../context/AuthContext';
-
+import './ChangePassword.css'
 export default function ChangePassword() {
   const { changePasswordFirebase } = useAuth();
   const [currentPassword, setCurrentPassword] = useState('');
@@ -29,7 +29,7 @@ export default function ChangePassword() {
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: '500px' }}>
+    <div className="container mt-5" style={{ maxWidth: '1000px' }}>
       <h3 className="mb-4">Change Password</h3>
       {message && (
         <div className={`alert alert-${variant}`} role="alert">

@@ -1,21 +1,19 @@
 import { useApi } from "../../../context/ApiContext";
-
+import "./Profile.css";
 
 export default function AdminProfile() {
-
-const {admin} = useApi();
-
+  const { admin } = useApi();
 
   return (
-    <div className="container mt-5">
-      <h2>Admin Profile</h2>
-      <div className="card p-4 mt-3">
-        <p><strong>Name:</strong> {admin.name}</p>
-        <p><strong>Email:</strong> {admin.email}</p>
-        <p><strong>Phone:</strong> {admin.phone_number}</p>
-        <p><strong>UID:</strong> {admin.uid}</p>
-        <p><strong>Address:</strong> {admin.address}</p>
-        <p><strong>ID:</strong> {admin._id}</p>
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+      <div className="profile-card card shadow p-4 w-100" style={{ maxWidth: "500px" }}>
+        <h3 className="text-center mb-4 profile-heading">Admin Profile</h3>
+        <p><strong className="text-green">Name:</strong> {admin.name}</p>
+        <p><strong className="text-green">Email:</strong> {admin.email}</p>
+        <p><strong className="text-green">Phone:</strong> {admin.phone_number}</p>
+        <p><strong className="text-green">UID:</strong> {admin.uid}</p>
+        <p><strong className="text-green">Address:</strong> {admin.address}</p>
+        <p><strong className="text-green">ID:</strong> {admin._id}</p>
       </div>
     </div>
   );

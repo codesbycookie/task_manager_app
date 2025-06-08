@@ -68,7 +68,7 @@ export default function AddTask() {
       frequency,
       users_assigned: assignedUsers,
       ...(frequency === "once" && { date }),
-      ...(frequency === "weekly" && { days }),
+      ...(frequency === "weekly" && { days: days }),
       ...(frequency === "monthly" && {
         dates: dates.split(",").map((d) => parseInt(d.trim())),
       }),

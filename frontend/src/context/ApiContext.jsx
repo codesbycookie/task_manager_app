@@ -304,13 +304,17 @@ export function ApiProvider({ children }) {
     }
   };
 
-  const fetchTasksForAdmin = async (userId) => {
+  const fetchTasksForAdmin = async (userId, selectedDate) => {
     try {
+      console.log(selectedDate.toLocaleDateString());
+      const formattedDate = selectedDate.toISOString().split("T")[0]; 
       const response = await getRequest(
-        `http://localhost:3000/api/tasks/fetch-tasks-for-user/${userId}`,
-        { userId: userId }
+        `http://localhost:3000/api/tasks/admin/tasks-for-user/${userId}?date=${formattedDate}`,
+        { userId: userId },
+        { admin_uid: admin.uid }
       );
       console.log(response);
+      console.log(`response for the date ${selectedDate}`, response);
       setTasks([]);
       setTasks(response.tasks);
     } catch (err) {

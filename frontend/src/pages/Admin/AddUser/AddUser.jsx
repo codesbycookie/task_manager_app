@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import { useApi } from "../../../context/ApiContext";
-
+import './AddUser.css'
 export default function AddUser() {
-  const { addUser, users, branches } = useApi(); 
-
+  const { addUser, users, branches } = useApi();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -11,7 +10,7 @@ export default function AddUser() {
     branch: "",
     phone_number: "",
     address: "",
-    copyFromUserId: "", 
+    copyFromUserId: "",
   });
 
   const handleChange = (e) => {
@@ -25,16 +24,28 @@ export default function AddUser() {
     e.preventDefault();
     addUser(formData);
     console.log("Submitted User:", formData);
+    setFormData({
+      name: "",
+      email: "",
+      branch: "",
+      phone_number: "",
+      address: "",
+      copyFromUserId: "",
+    });
   };
 
-
+  const isFormValid =
+    formData.name.trim() !== "" &&
+    formData.email.trim() !== "" &&
+    formData.branch.trim() !== "" &&
+    formData.phone_number.trim() !== "" &&
+    formData.address.trim() !== "";
 
   return (
     <div className="container mt-5">
       <h2 className="mb-4">Add New User</h2>
       <form onSubmit={handleSubmit}>
-
-        {/* Copy Tasks From User - New field */}
+        {/* Copy Tasks From User */}
         <div className="mb-3">
           <label className="form-label">Copy Tasks From User</label>
           {users.length === 0 && <p>No users available</p>}
@@ -49,16 +60,14 @@ export default function AddUser() {
                 checked={formData.copyFromUserId === user._id}
                 onChange={handleChange}
               />
-              <label
-                className="form-check-label"
-                htmlFor={`copy-user-${user._id}`}
-              >
+              <label className="form-check-label" htmlFor={`copy-user-${user._id}`}>
                 {user.name} ({user.email})
               </label>
             </div>
           ))}
         </div>
 
+        {/* Name */}
         <div className="mb-3">
           <label className="form-label">Name</label>
           <input
@@ -71,6 +80,7 @@ export default function AddUser() {
           />
         </div>
 
+        {/* Email */}
         <div className="mb-3">
           <label className="form-label">Email</label>
           <input
@@ -83,6 +93,7 @@ export default function AddUser() {
           />
         </div>
 
+        {/* Branch */}
         <div className="mb-3">
           <label className="form-label">Select Branch</label>
           {branches.map((branch) => (
@@ -97,16 +108,14 @@ export default function AddUser() {
                 onChange={handleChange}
                 required
               />
-              <label
-                className="form-check-label"
-                htmlFor={`branch-${branch._id}`}
-              >
+              <label className="form-check-label" htmlFor={`branch-${branch._id}`}>
                 {branch.name} ({branch.address})
               </label>
             </div>
           ))}
         </div>
 
+        {/* Phone */}
         <div className="mb-3">
           <label className="form-label">Phone Number</label>
           <input
@@ -115,10 +124,13 @@ export default function AddUser() {
             className="form-control"
             value={formData.phone_number}
             onChange={handleChange}
+            pattern="[0-9]{10}"
+            title="Enter a 10-digit phone number"
             required
           />
         </div>
 
+        {/* Address */}
         <div className="mb-3">
           <label className="form-label">Address</label>
           <textarea
@@ -130,7 +142,8 @@ export default function AddUser() {
           />
         </div>
 
-        <button type="submit" className="btn btn-primary">
+        {/* Submit */}
+        <button type="submit" className="btn btn-primary" disabled={!isFormValid}>
           Add User
         </button>
       </form>

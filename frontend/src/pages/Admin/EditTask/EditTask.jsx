@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useApi } from "../../../context/ApiContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import {getRequest} from '../../../utils/ApiService'
+import './EditTask.css'
+
+
 export default function EditTask() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -232,7 +235,7 @@ export default function EditTask() {
       <button
         type="button"
         className="btn btn-secondary"
-        onClick={() => navigate("/admin/tasks")}
+        onClick={() => navigate(-1)}
       >
         Cancel
       </button>

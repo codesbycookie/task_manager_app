@@ -1,0 +1,14 @@
+.profile-card {
+  background-color: white;
+  border-radius: 12px;
+  border: 1px solid #eee;
+}
+
+.profile-heading {
+  color: #8dc540;
+  font-weight: 600;
+}
+
+.text-green {
+  color: #8dc540;
+}

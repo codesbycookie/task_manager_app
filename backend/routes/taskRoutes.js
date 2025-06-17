@@ -11,10 +11,10 @@ const {addTask, editTask, deleteTask, getTaskByUserId, submitTask, fetchTaskStat
 
 router.post('/admin/add-task', verifyAdmin, addTask)
 router.put('/admin/edit-task/:taskId', verifyAdmin, verifyTask, editTask)
-router.delete('/admin/delete-task/:taskId', verifyAdmin, verifyTask, deleteTask)
-router.get('/admin/tasks-for-user/:userId',  getTaskByUserId)
+router.delete('/admin/delete-task/:taskStatusId', verifyAdmin, deleteTask)
 router.post('/submit-task', verifyUser, verifyTask, submitTask)
 router.get('/fetch-tasks-for-user/:userId', verifyUser, fetchTaskStatusForUser)
+router.get('/admin/tasks-for-user/:userId',  getTaskByUserId)
 
 
 module.exports = router

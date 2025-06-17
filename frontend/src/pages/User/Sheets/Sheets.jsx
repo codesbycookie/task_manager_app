@@ -1,49 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { getRequest, postRequest } from '../../../utils/ApiService';
 import { useApi } from '../../../context/ApiContext';
-import {toast} from 'react-toastify'
 
 export default function UserSheets() {
-  const { user } = useApi();
-  const [tasks, setTasks] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const { user, fetchTasksForUser, userTasks, submitTask, loading } = useApi();
 
-  const fetchTasks = async () => {
-    if (!user?._id) return;
-    try {
-      setLoading(true);
-      const response = await getRequest(`http://localhost:3000/api/tasks/fetch-tasks-for-user/${user._id}`);
-      setTasks(response.tasks || []);
-      console.log('user todays tasks', response.tasks)
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
-    if (user?._id) fetchTasks();
+    if (user?._id) fetchTasksForUser(user?._id);
   }, []);
 
   const handleSubmitTask = async (e, taskId, taskStatusId) => {
     e.preventDefault();
     try {
-      setLoading(true);
-      await postRequest('http://localhost:3000/api/tasks/submit-task', {
-        userId: user._id,
-        taskId: taskId,
-        taskStatusId: taskStatusId,
-        date: new Date(),
-      });
-      fetchTasks();
-      
+      submitTask(taskId, taskStatusId);
     } catch (error) {
       console.error('Error submitting task:', error);
-      toast.error(error.message)
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -51,7 +23,7 @@ export default function UserSheets() {
     <div className="container my-4">
       <div className="d-flex align-items-center mb-3">
         <h3 className="mb-0">Your Today's Task Sheet</h3>
-        <button className="btn btn-primary ms-auto" onClick={fetchTasks}>
+        <button className="btn btn-primary ms-auto" onClick={fetchTasksForUser} disabled={loading}>
           Refresh
         </button>
       </div>
@@ -60,7 +32,7 @@ export default function UserSheets() {
         <div className="text-center my-4">
           <div className="spinner-border text-primary" role="status" />
         </div>
-      ) : tasks.length === 0 ? (
+      ) : userTasks.length === 0 ? (
         <div className="alert alert-info text-center">No tasks for today!</div>
       ) : (
         <table className="table table-bordered table-hover">
@@ -75,7 +47,7 @@ export default function UserSheets() {
             </tr>
           </thead>
           <tbody>
-            {tasks.map((task, index) => (
+            {userTasks.map((task, index) => (
               <tr key={task._id}>
                 <td>{index + 1}</td>
                 <td

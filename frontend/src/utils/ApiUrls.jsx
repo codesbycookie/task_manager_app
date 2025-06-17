@@ -3,22 +3,27 @@ const baseUrl = import.meta.env.VITE_BASE_URL;
 const urls = {
   // User URLs
   registerUserUrl: `${baseUrl}/user-register`,
-  loginUserUrl: `${baseUrl}/user-login`,
+  loginUserUrl: `${baseUrl}/user/user-login`,
   updateUserUrl: (userId) => `${baseUrl}/user-update/${userId}`,
-  deleteUserUrl: (userId) => `${baseUrl}/user-delete/${userId}`,
+  deleteUserUrl: (userId) => `${baseUrl}/admin/user-delete/${userId}`,
+  fetchUsersUrl: `${baseUrl}/get-all-users`,
 
   // Task URLs
-  addTaskUrl: `${baseUrl}/api/tasks/admin/add-task`,
-  updateTaskUrl: (taskId) => `${baseUrl}/api/tasks/admin/update-task/${taskId}`,
-  deleteTaskUrl: (taskId) => `${baseUrl}/api/tasks/admin/delete-task/${taskId}`,
-  getTasksForUserUrl: (userId) => `${baseUrl}/api/tasks/admin/tasks-for-user/${userId}`,
-  submitTaskUrl: `${baseUrl}/api/tasks/submit-task`,
+  addTaskUrl: `${baseUrl}/tasks/admin/add-task`,
+  editTaskUrl: (taskId) => `${baseUrl}/tasks/admin/edit-task/${taskId}`,
+  deleteTaskStatusUrl: (taskStatusId) => `${baseUrl}/tasks/admin/delete-task/${taskStatusId}`,
+  getTasksForUserUrl: (userId) => `${baseUrl}/tasks/fetch-tasks-for-user/${userId}`,
+  getTasksForAdminUrl: (userId) => `${baseUrl}/tasks/admin/tasks-for-user/${userId}`,
+  submitTaskUrl: `${baseUrl}/tasks/submit-task`,
 
   // Branch URLs
   createBranchUrl: `${baseUrl}/admin/create-branch`,
-  fetchBranchesUrl: `${baseUrl}/branches`,
-  updateBranchUrl: (branchId) => `${baseUrl}/admin/edit-branch/${branchId}`,
+  fetchBranchesUrl: `${baseUrl}/admin/branches`,
+  editBranchUrl: (branchId) => `${baseUrl}/admin/edit-branch/${branchId}`,
   deleteBranchUrl: (branchId) => `${baseUrl}/admin/delete-branch/${branchId}`,
+
+  // Admin URLs
+  loginAdminUrl: `${baseUrl}/admin/admin/login`,
 };
 
 export default urls;

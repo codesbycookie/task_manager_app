@@ -139,11 +139,22 @@ const deleteUser = async (req, res) => {
   }
 }
 
+const getAllUsers = async(req, res) => {
+    try {
+        const users = await User.find({}).populate('branch');
+        console.log(users)
+        res.status(200).json({ message: 'Users fetched successfully', users });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
+
 
 module.exports = {
   editUser,
   userLogin,
   deleteUser,
-  userRegister
+  userRegister,
+  getAllUsers
 }
  

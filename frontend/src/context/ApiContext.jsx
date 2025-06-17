@@ -1,7 +1,5 @@
-/* eslint-disable react-refresh/only-export-components */
-/* eslint-disable no-unused-vars */
 import { useContext, createContext, useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getCookie, setCookie, removeCookie } from "../utils/CookieService";
 import { useAuth } from "./AuthContext";
@@ -12,19 +10,47 @@ import {
   deleteRequest,
 } from "../utils/ApiService";
 import handleFirebaseError from "../utils/HandleFirebaseError";
-// import { toast } from "react-toastify";
-// import Loading from "../pages/components/Loading/Loading";
-// import { useNavigateOnce } from "../utils/UseNavigateOnce";
 import urls from "../utils/ApiUrls";
 import handleApiError from "../utils/HandleApiError";
 
 const {
-  addProductUrl,
-  fetchAdminUrl,
-  fetchOrdersUrl,
-  fetchProducts,
-  deleteProductUrl,
+  registerUserUrl,
+  loginUserUrl,
+  updateUserUrl,
+  deleteUserUrl,
+  fetchUsersUrl,
+  addTaskUrl,
+  editTaskUrl,
+  deleteTaskStatusUrl,
+  getTasksForUserUrl,
+  getTasksForAdminUrl,
+  submitTaskUrl,
+  createBranchUrl,
+  fetchBranchesUrl,
+  editBranchUrl,
+  deleteBranchUrl,
+  loginAdminUrl,
 } = urls;
+
+console.log("API URLs:", {
+  registerUserUrl,
+  loginUserUrl,
+  updateUserUrl,
+  deleteUserUrl,
+  fetchUsersUrl,
+  addTaskUrl,
+  editTaskUrl,
+  deleteTaskStatusUrl,
+  getTasksForUserUrl,
+  getTasksForAdminUrl,
+  submitTaskUrl,
+  createBranchUrl,
+  fetchBranchesUrl,
+  editBranchUrl,
+  deleteBranchUrl,
+  loginAdminUrl,
+});
+
 const ApiContext = createContext();
 
 export function useApi() {
@@ -32,41 +58,22 @@ export function useApi() {
 }
 
 export function ApiProvider({ children }) {
-  // const fetchUserOrAdmin = async () => {
-  //   const adminLoginUrl = "http://localhost:3000/api/admin/admin/login";
-  //   const userLoginUrl = "http://localhost:3000/api/user/user-login";
-
-  //   const admin_uid = getCookie("admin_uid");
-  //   if (admin_uid) {
-  //     const res = await postRequest(adminLoginUrl, {
-  //       uid: admin_uid,
-  //     });
-  //     console.log(res)
-  //     return res.admin;
-  //   } else {
-  //     const user_uid = getCookie("user_uid");
-  //     if (user_uid) {
-  //       const res = await postRequest(userLoginUrl, { uid: user_uid });
-  //       return res.user;
-  //     }
-  //   }
-  // };
 
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({});
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [userTasks, setUserTasks] = useState([]);
   const [admin, setAdmin] = useState({});
   const [branches, setBranches] = useState([]);
 
-  const fetchUserOrAdmin = async () => {
-    const adminLoginUrl = "http://localhost:3000/api/admin/admin/login";
-    const userLoginUrl = "http://localhost:3000/api/user/user-login";
+  const { signup, loginFirebase, logoutFirebase, changePasswordFirebase } = useAuth();
 
+  const fetchUserOrAdmin = async () => {
     const admin_uid = getCookie("admin_uid");
 
     if (admin_uid) {
-      const res = await postRequest(adminLoginUrl, { uid: admin_uid });
+      const res = await postRequest(loginAdminUrl, { uid: admin_uid });
       if (res?.admin) {
         console.log(res);
         setAdmin(res.admin);
@@ -76,7 +83,7 @@ export function ApiProvider({ children }) {
     } else {
       const user_uid = getCookie("user_uid");
       if (user_uid) {
-        const res = await postRequest(userLoginUrl, { uid: user_uid });
+        const res = await postRequest(loginUserUrl, { uid: user_uid });
         if (res?.user) {
           setUser(res.user);
         }
@@ -91,18 +98,14 @@ export function ApiProvider({ children }) {
   console.log(admin);
 
   console.log("admin uid: ", getCookie("admin_uid"));
+  console.log("user uid: ", getCookie("user_uid"));
 
-  // console.log(getCookie("user_uid"));
-
-  const { signup, loginFirebase, logoutFirebase } = useAuth();
   const navigate = useNavigate();
 
   const login = async (formData) => {
     console.log("Login function called with formData:", formData);
     setLoading(true);
 
-    const adminLoginUrl = "http://localhost:3000/api/admin/admin/login";
-    const userLoginUrl = "http://localhost:3000/api/user/user-login";
     try {
       console.log(formData);
       removeCookie("admin_uid");
@@ -111,15 +114,16 @@ export function ApiProvider({ children }) {
       if (user) {
         console.log(user.user);
         if (formData.isAdmin) {
-          const data = await postRequest(adminLoginUrl, {
+          const data = await postRequest(loginAdminUrl, {
             uid: user.user.uid,
           });
           console.log(data.admin);
           setCookie("admin_uid", user.user.uid);
+          fetchUserOrAdmin();
           navigate("/admin/");
           toast.success(`Welcome back! ${data.admin.name}`);
         } else {
-          const data = await postRequest(userLoginUrl, {
+          const data = await postRequest(loginUserUrl, {
             uid: user.user.uid,
           });
           console.log(data);
@@ -147,7 +151,7 @@ export function ApiProvider({ children }) {
         console.log(user.user.uid);
         console.log({ uid: user.user.uid, ...formData });
         const response = await postRequest(
-          "http://localhost:3000/api/user/user-register",
+          registerUserUrl,
           {
             uid: user.user.uid,
             branchId: formData.branch,
@@ -173,7 +177,7 @@ export function ApiProvider({ children }) {
   const deleteUser = async (userUid) => {
     try {
       const res = await deleteRequest(
-        `http://localhost:3000/api/user/admin/user-delete/${userUid}`,
+        deleteUserUrl(userUid),
         {},
         { admin_uid: admin.uid }
       );
@@ -189,7 +193,7 @@ export function ApiProvider({ children }) {
     try {
       console.log(admin.uid);
       const response = await getRequest(
-        "http://localhost:3000/api/branch/admin/branches",
+        fetchBranchesUrl,
         {},
         { admin_uid: admin.uid }
       );
@@ -203,7 +207,7 @@ export function ApiProvider({ children }) {
   const fetchUsers = async () => {
     try {
       const response = await getRequest(
-        "http://localhost:3000/api/user/get-all-users",
+        fetchUsersUrl,
         {},
         { admin_uid: admin.uid }
       );
@@ -215,11 +219,9 @@ export function ApiProvider({ children }) {
 
   const createBranch = async (branch) => {
     try {
-      const response = await postRequest(
-        "http://localhost:3000/api/branch/admin/create-branch",
-        branch,
-        { admin_uid: admin.uid }
-      );
+      const response = await postRequest(createBranchUrl, branch, {
+        admin_uid: admin.uid,
+      });
       navigate("/admin/branches");
       fetchBranches();
       toast.success(response.message);
@@ -231,7 +233,7 @@ export function ApiProvider({ children }) {
   const deleteBranch = async (branchId) => {
     try {
       const response = await deleteRequest(
-        "http://localhost:3000/api/branch/admin/delete-branch/" + branchId,
+        deleteBranchUrl(branchId),
         {},
         { admin_uid: admin.uid }
       );
@@ -247,11 +249,9 @@ export function ApiProvider({ children }) {
   const editBranch = async (branchId, formData) => {
     try {
       console.log("Updated data:", formData);
-      await putRequest(
-        `http://localhost:3000/api/branch/admin/edit-branch/${branchId}`,
-        formData,
-        { admin_uid: admin.uid }
-      );
+      await putRequest(editBranchUrl(branchId), formData, {
+        admin_uid: admin.uid,
+      });
       fetchBranches();
       navigate("/admin/branches");
     } catch (err) {
@@ -262,12 +262,10 @@ export function ApiProvider({ children }) {
 
   const assignTask = async (task) => {
     try {
-      const response = postRequest(
-        "http://localhost:3000/api/tasks/admin/add-task",
-        task,
-        { admin_uid: admin.uid }
-      );
-      navigate("/admin/users");
+      const response = postRequest(addTaskUrl, task, { admin_uid: admin.uid });
+      navigate(-1);
+      console.log('assigned task',response);
+
       toast.success(response.message);
     } catch (err) {
       handleApiError(err);
@@ -277,11 +275,9 @@ export function ApiProvider({ children }) {
   const editTask = async (task) => {
     try {
       console.log("Updated data:", task);
-      const res = await putRequest(
-        `http://localhost:3000/api/tasks/admin/edit-task/${task._id}`,
-        task,
-        { admin_uid: admin.uid }
-      );
+      const res = await putRequest(editTaskUrl(task._id), task, {
+        admin_uid: admin.uid,
+      });
       toast.success(res.message);
       navigate(-1);
     } catch (err) {
@@ -289,15 +285,15 @@ export function ApiProvider({ children }) {
     }
   };
 
-  const deleteTask = async (taskId, userId) => {
+  const deleteTask = async (taskStatusId, userId, selectedDate) => {
     try {
       const response = await deleteRequest(
-        "http://localhost:3000/api/tasks/admin/delete-task/" + taskId,
+        deleteTaskStatusUrl(taskStatusId),
         {},
         { admin_uid: admin.uid }
       );
       toast.success(response.message);
-      fetchTasksForAdmin(userId);
+      fetchTasksForAdmin(userId, selectedDate);
       console.log(response);
     } catch (err) {
       handleApiError(err);
@@ -306,11 +302,9 @@ export function ApiProvider({ children }) {
 
   const fetchTasksForAdmin = async (userId, selectedDate) => {
     try {
-      console.log(selectedDate.toLocaleDateString());
-      const formattedDate = selectedDate.toISOString().split("T")[0]; 
       const response = await getRequest(
-        `http://localhost:3000/api/tasks/admin/tasks-for-user/${userId}?date=${formattedDate}`,
-        { userId: userId },
+        getTasksForAdminUrl(userId),
+        {},
         { admin_uid: admin.uid }
       );
       console.log(response);
@@ -319,6 +313,70 @@ export function ApiProvider({ children }) {
       setTasks(response.tasks);
     } catch (err) {
       handleApiError(err);
+    }
+  };
+
+  const fetchTasksForUser = async () => {
+    setLoading(true);
+    try {
+      const response = await getRequest(
+        getTasksForUserUrl(user._id),
+        {},
+        { user_uid: user._id }
+      );
+      console.log("Fetched tasks for user:", response);
+      setUserTasks(response.tasks || []);
+    } catch (err) {
+      handleApiError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const submitTask = async (taskId, taskStatusId) => {
+    setLoading(true);
+    try {
+      const response = await postRequest(
+        submitTaskUrl,
+        {
+          userId: user._id,
+          taskId: taskId,
+          taskStatusId: taskStatusId,
+          date: new Date(),
+        },
+        { user_uid: user._id }
+      );
+      console.log("Task submitted successfully:", response);
+      toast.success(response.message || "Task submitted successfully");
+      fetchTasksForUser();
+    } catch (err) {
+      handleApiError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const changePasswordForUser = async (
+    currentPassword,
+    newPassword,
+    confirmPassword
+  ) => {
+    setLoading(true);
+    try {
+      if (newPassword !== confirmPassword) {
+        return toast.error("Passwords do not match");
+      }
+      const result = await changePasswordFirebase(currentPassword, newPassword);
+      if (result.success) {
+        toast.success("Password changed successfully!");
+      } else {
+        toast.error(`Error: ${result.error}`);
+      }
+      navigate("/user");
+    } catch (err) {
+      handleApiError(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -357,6 +415,11 @@ export function ApiProvider({ children }) {
     logout,
     fetchUserOrAdmin,
     user,
+    fetchTasksForUser,
+    userTasks,
+    loading,
+    submitTask,
+    changePasswordForUser,
   };
   return (
     <ApiContext.Provider value={value}>

@@ -54,6 +54,10 @@ const userLogin = async (req, res) => {
       return res.status(404).json({ message: 'User not found!' })
     }
 
+    user.last_login = new Date();
+
+    await user.save();
+
     res.status(200).json({ message: 'User Login Successful!', user: user })
   } catch (err) {
     res.status(500).json({ message: err.message })
@@ -62,28 +66,35 @@ const userLogin = async (req, res) => {
 
 const userRegister = async (req, res) => {
   try {
-    const { name, email, branchId, phone_number, copyFromUserId, uid, address } = req.body;
-    console.log({ name, email, branchId, phone_number, copyFromUserId, uid, address });
-    // Save user
+    const {
+      name,
+      email,
+      branchId,
+      phone_number,
+      uid,
+      address,
+      copyFromUserId,
+      tasksToCopy = []
+    } = req.body;
+
+    console.log({ name, email, branchId, phone_number, copyFromUserId, uid, address, tasksToCopy });
+
+    // Create new user
     const user = new User({ name, email, branch: branchId, phone_number, uid, address });
     await user.save();
 
-    // Increment member count in the branch
-    const branch = await Branch.findById(branchId)
+    // Update branch member count
+    const branch = await Branch.findById(branchId);
+    if (branch) {
+      branch.members_count = (branch.members_count || 0) + 1;
+      await branch.save();
+    }
 
-    console.log(branch)
+    // Selective task copying logic
+    if (copyFromUserId && tasksToCopy.length > 0) {
+      const tasks = await Task.find({ _id: { $in: tasksToCopy } });
 
-    branch.members_count = branch.members_count + 1
-
-    await branch.save();
-
-
-    if (copyFromUserId) {
-      console.log(copyFromUserId)
-      const tasksToCopy = await Task.find({ users_assigned: copyFromUserId });
-
-      console.log("Tasks to copy: ", tasksToCopy);
-      for (const task of tasksToCopy) {
+      for (const task of tasks) {
         if (!task.users_assigned.includes(user._id)) {
           task.users_assigned.push(user._id);
           await task.save();
@@ -91,19 +102,27 @@ const userRegister = async (req, res) => {
           await TaskStatus.create({
             task: task._id,
             user: user._id,
-            status: 'not completed'
-          })
+            status: 'not completed',
+            date: new Date(), // you may want to adjust this to today's schedule
+          });
 
-          console.log("Task updated: ", task);
+          console.log("✅ Task copied:", task.title);
         }
       }
     }
 
-    res.status(201).json({ message: "User Registered Successfully.", user: user, copiedFrom: copyFromUserId || null });
+    res.status(201).json({
+      message: "User Registered Successfully.",
+      user: user,
+      copiedTasks: tasksToCopy.length
+    });
+
   } catch (err) {
+    console.error("❌ Error registering user:", err);
     res.status(500).json({ message: err.message });
   }
-}
+};
+
 
 const deleteUser = async (req, res) => {
   try {

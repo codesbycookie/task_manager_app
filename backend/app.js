@@ -45,25 +45,31 @@ app.use('/api/user', userRoutes);
 app.use('/api/branch', branchRoutes);
 app.use('/api/admin', adminRoutes);
 
-cron.schedule("0 0 * * *", async () => {
-  console.log("⏰ Running daily missed task checker - 12:00 AM");
+refreshMissedStatusesForUser('68581023a0104202b3afb6fc')
 
-  try {
-    const allUsers = await User.find();
+// cron.schedule("0 0 * * *", async () => {
+//   console.log(`⏰ [${new Date().toLocaleString()}] Running daily missed task checker`);
 
-    for (const user of allUsers) {
-      await refreshMissedStatusesForUser(user._id);
-      console.log(`✅ Checked missed tasks for user: ${user.name}`);
-    }
+//   try {
+//     const allUsers = await User.find();
 
-    console.log("🎉 All users processed successfully");
+//     await Promise.all(
+//       allUsers.map(user =>
+//         refreshMissedStatusesForUser(user._id)
+//           .then(() => console.log(`✅ Checked missed tasks for user: ${user.name}`))
+//           .catch(err => console.error(`❌ Error for user ${user.name}:`, err.message))
+//       )
+//     );
 
-  } catch (err) {
-    console.error("❌ Error in cron job:", err.message);
-  }
-}, {
-  timezone: "Asia/Kolkata",
-});
+//     console.log("🎉 All users processed successfully");
+
+//   } catch (err) {
+//     console.error("❌ Error in cron job:", err.message);
+//   }
+// }, {
+//   timezone: "Asia/Kolkata",
+// });
+
 
 app.listen(3000, () => {
   console.log('Listening to the port 3000');

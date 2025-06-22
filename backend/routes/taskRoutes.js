@@ -7,7 +7,7 @@ const verifyUser = require('../middlewares/verifyUser');
 const verifyBranch = require('../middlewares/verifyBranch');
 
 
-const {addTask, editTask, deleteTask, getTaskByUserId, submitTask, fetchTaskStatusForUser} = require('../controllers/taskController');
+const {addTask, editTask, deleteTask,fetchTasksToCopyForUser, getTaskByUserId, submitTask, fetchTaskStatusForUser} = require('../controllers/taskController');
 
 router.post('/admin/add-task', verifyAdmin, addTask)
 router.put('/admin/edit-task/:taskId', verifyAdmin, verifyTask, editTask)
@@ -15,6 +15,6 @@ router.delete('/admin/delete-task/:taskStatusId', verifyAdmin, deleteTask)
 router.post('/submit-task', verifyUser, verifyTask, submitTask)
 router.get('/fetch-tasks-for-user/:userId', verifyUser, fetchTaskStatusForUser)
 router.get('/admin/tasks-for-user/:userId',  getTaskByUserId)
-
+router.get('/admin/tasks-to-copy/:userId', fetchTasksToCopyForUser)
 
 module.exports = router

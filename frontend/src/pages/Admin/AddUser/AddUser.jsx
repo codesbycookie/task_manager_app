@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useApi } from "../../../context/ApiContext";
-import './AddUser.css'
+import "./AddUser.css";
+
 export default function AddUser() {
   const { addUser, users, branches } = useApi();
 
@@ -13,17 +14,54 @@ export default function AddUser() {
     copyFromUserId: "",
   });
 
-  const handleChange = (e) => {
+  const [taskOptions, setTaskOptions] = useState([]); // tasks of selected user
+  const [selectedUserTasks, setSelectedUserTasks] = useState([]); // selected task IDs
+
+  const handleChange = async (e) => {
+    const { name, value } = e.target;
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
+
+    if (name === "copyFromUserId") {
+      try {
+        const res = await fetch(
+          `http://localhost:3000/api/tasks/admin/tasks-to-copy/${value}`
+        ); // replace with your actual route
+        const data = await res.json();
+        console.log("Fetched Tasks:", data);
+        setTaskOptions(data.tasks || []); // assuming the response has a 'tasks' field
+        setSelectedUserTasks([]);
+      } catch (err) {
+        console.error("Failed to fetch user tasks", err);
+        setTaskOptions([]);
+        setSelectedUserTasks([]);
+      }
+    }
+  };
+
+  const handleTaskToggle = (taskId) => {
+    if (selectedUserTasks.includes(taskId)) {
+      setSelectedUserTasks(selectedUserTasks.filter((id) => id !== taskId));
+    } else {
+      setSelectedUserTasks([...selectedUserTasks, taskId]);
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addUser(formData);
-    console.log("Submitted User:", formData);
+
+    const payload = {
+      ...formData,
+      tasksToCopy: selectedUserTasks,
+    };
+
+    addUser(payload);
+    console.log("Submitted User:", payload);
+
+    // Reset
     setFormData({
       name: "",
       email: "",
@@ -32,6 +70,8 @@ export default function AddUser() {
       address: "",
       copyFromUserId: "",
     });
+    setTaskOptions([]);
+    setSelectedUserTasks([]);
   };
 
   const isFormValid =
@@ -45,27 +85,69 @@ export default function AddUser() {
     <div className="container mt-5">
       <h2 className="mb-4">Add New User</h2>
       <form onSubmit={handleSubmit}>
-        {/* Copy Tasks From User */}
+        {/* Copy From User */}
         <div className="mb-3">
           <label className="form-label">Copy Tasks From User</label>
           {users.length === 0 && <p>No users available</p>}
-          {users.map((user) => (
-            <div className="form-check" key={user._id}>
-              <input
-                className="form-check-input"
-                type="radio"
-                name="copyFromUserId"
-                id={`copy-user-${user._id}`}
-                value={user._id}
-                checked={formData.copyFromUserId === user._id}
-                onChange={handleChange}
-              />
-              <label className="form-check-label" htmlFor={`copy-user-${user._id}`}>
-                {user.name} ({user.email})
-              </label>
-            </div>
-          ))}
+{users.map((user) => (
+  <div key={user._id}>
+    <div className="form-check">
+      <input
+        className="form-check-input"
+        type="radio"
+        name="copyFromUserId"
+        id={`copy-user-${user._id}`}
+        value={user._id}
+        checked={formData.copyFromUserId === user._id}
+        onChange={handleChange}
+      />
+      <label className="form-check-label" htmlFor={`copy-user-${user._id}`}>
+        {user.name} ({user.email})
+      </label>
+    </div>
+
+    {/* ✅ Show 'no tasks' message only for selected user */}
+    {formData.copyFromUserId === user._id && taskOptions.length === 0 && (
+      <div className="alert alert-info ms-3 mt-2">
+        This user has no tasks to copy.{" "}
+        <a
+          href={`/admin/users/sheets/${user._id}`}
+          className="ms-2 btn btn-sm btn-primary"
+        >
+          Add Task to this user
+        </a>
+      </div>
+    )}
+  </div>
+))}
+
         </div>
+
+        {/* Task Selection */}
+        {taskOptions.length > 0 ? (
+          <div className="mb-3">
+            <label className="form-label">Select Tasks to Copy</label>
+            {taskOptions.map((task) => (
+              <div className="form-check" key={task._id}>
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`task-${task._id}`}
+                  checked={selectedUserTasks.includes(task._id)}
+                  onChange={() => handleTaskToggle(task._id)}
+                />
+                <label
+                  className="form-check-label"
+                  htmlFor={`task-${task._id}`}
+                >
+                  {task.title}
+                </label>
+              </div>
+            ))}
+          </div>
+        ) : (
+          ""
+        )}
 
         {/* Name */}
         <div className="mb-3">
@@ -108,14 +190,17 @@ export default function AddUser() {
                 onChange={handleChange}
                 required
               />
-              <label className="form-check-label" htmlFor={`branch-${branch._id}`}>
+              <label
+                className="form-check-label"
+                htmlFor={`branch-${branch._id}`}
+              >
                 {branch.name} ({branch.address})
               </label>
             </div>
           ))}
         </div>
 
-        {/* Phone */}
+        {/* Phone Number */}
         <div className="mb-3">
           <label className="form-label">Phone Number</label>
           <input
@@ -143,7 +228,11 @@ export default function AddUser() {
         </div>
 
         {/* Submit */}
-        <button type="submit" className="btn btn-primary" disabled={!isFormValid}>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={!isFormValid}
+        >
           Add User
         </button>
       </form>

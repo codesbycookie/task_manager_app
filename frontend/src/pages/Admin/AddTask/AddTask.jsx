@@ -161,6 +161,7 @@ export default function AddTask() {
             type="date"
             className="form-control"
             value={date}
+                      min={new Date().toISOString().split("T")[0]}
             onChange={(e) => setDate(e.target.value)}
             required
           />

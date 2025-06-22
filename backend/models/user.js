@@ -28,6 +28,9 @@ const user_schema = new mongoose.Schema({
         type: String,
         required: true,
         default: ''
+    },
+    last_login: {
+        type: Date
     }   
 }, {timestamps: true})
 

@@ -157,7 +157,7 @@ const deleteTask = async (req, res) => {
     task.users_assigned = task.users_assigned.filter(userId => userId.toString() !== deletedTaskStatus.user.toString());
 
     await task.save();
-    
+
     if (!deletedTaskStatus) {
       return res.status(404).json({ message: "Task not found" });
     }
@@ -261,12 +261,19 @@ const getTaskByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
 
+        const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+
     const statuses = await TaskStatus.find({ user: userId }).populate('task').populate('user');
 
 
-    console.log(statuses)
 
-    res.status(200).json({ tasks: statuses });
+    console.log({statuses, user})
+
+    res.status(200).json({ tasks: statuses, user: user });
 
   } catch (err) {
     console.error("Error in getTaskByUserId:", err);
@@ -279,55 +286,70 @@ const fetchTaskStatusForUser = async (req, res) => {
     const { userId } = req.params;
     if (!userId) return res.status(400).json({ message: "User ID is required" });
 
-    const today = new Date(); // you can also test with new Date("2025-06-18T00:00:00Z")
+    const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
     const dayNumber = today.getDate();
 
-    // Fetch task statuses for ONLY the selected date (not all)
+    console.log({ dayName, dayNumber, today: today.toLocaleDateString() });
+
+    // Define start and end of today
     const startOfDay = new Date(today);
     const endOfDay = new Date(today);
     endOfDay.setHours(23, 59, 59, 999);
 
+    // Fetch today's statuses for user
     const taskStatuses = await TaskStatus.find({
       user: userId,
       date: { $gte: startOfDay, $lte: endOfDay },
-    }).populate("task").populate("user");
+    }).populate("task").populate('user');
 
-    // Build a map to find completed statuses quickly
+    // Map for fast lookup
     const statusMap = new Map();
-    for (const sheet of taskStatuses) {
-      statusMap.set(sheet.task._id.toString(), sheet.status);
+    for (const s of taskStatuses) {
+      statusMap.set(s.task._id.toString(), s);
     }
 
-    // Fetch all tasks assigned to this user (assuming you're doing this in your app)
+    // Fetch all tasks assigned to the user
     const allTasks = await Task.find({ users_assigned: userId });
 
-    // Filter tasks that match today's frequency
-    const filtered = allTasks
-      .filter((task) => {
-        const frequency = task.frequency;
-        const taskDate = task.date ? new Date(task.date) : null;
-        taskDate?.setHours(0, 0, 0, 0);
+    const filteredTasks = [];
 
-        return (
-          frequency === "daily" ||
-          (frequency === "weekly" && task.days?.includes(dayName)) ||
-          (frequency === "monthly" && task.dates?.includes(dayNumber)) ||
-          (frequency === "once" && taskDate?.getTime() === today.getTime())
-        );
-      })
-      .map((task) => {
-        const status = statusMap.get(task._id.toString()) || "not completed";
-        return {
-          task,
-          status,
-          date: today.toISOString().split("T")[0],
-        };
+    for (const task of allTasks) {
+      const frequency = task.frequency;
+      const taskDate = task.date ? new Date(task.date) : null;
+      taskDate?.setHours(0, 0, 0, 0);
+
+      const isDueToday =
+        frequency === "daily" ||
+        (frequency === "weekly" && task.days?.includes(dayName)) ||
+        (frequency === "monthly" && task.dates?.includes(dayNumber)) ||
+        (frequency === "once" && taskDate?.toLocaleDateString() === today.toLocaleDateString());
+
+      if (!isDueToday) continue;
+
+      let status = statusMap.get(task._id.toString());
+
+      // If not already created, create TaskStatus with 'not completed'
+      if (!status) {
+        status = await TaskStatus.create({
+          user: userId,
+          task: task._id,
+          date: today,
+          status: "not completed",
+        });
+      }
+
+      filteredTasks.push({
+        task,
+        status: status,
+        completedAt: status.completedAt || null,
+        date: today,
       });
+    }
 
-    res.status(200).json({ tasks: filtered });
+    res.status(200).json({ tasks: filteredTasks });
 
   } catch (err) {
     console.error(err);
@@ -344,34 +366,53 @@ const submitTask = async (req, res) => {
   try {
     const { userId, taskId, taskStatusId, date } = req.body;
 
+    console.log({ userId, taskId, taskStatusId, date });
+
     if (!userId || !taskId || !date) {
       return res.status(400).json({ message: 'userId, taskId, and date are required.' });
     }
 
     const assignedDate = new Date(date);
-    assignedDate.setHours(0, 0, 0, 0);
 
     if (taskStatusId) {
-      // ✅ Update existing task status
       const existingStatus = await TaskStatus.findById(taskStatusId);
       if (!existingStatus) {
         return res.status(404).json({ message: 'TaskStatus not found.' });
       }
 
-      existingStatus.status = 'completed';
-      existingStatus.completedAt = new Date(); // Mark current time of submission
-      await existingStatus.save();
+      const existingDate = new Date(existingStatus.date);
+      existingDate.setHours(0, 0, 0, 0);
 
-      return res.status(200).json({ success: true, message: 'Task marked as completed.', taskStatus: existingStatus });
+      if (existingDate.toLocaleDateString() !== assignedDate.toLocaleDateString()) {
+        return res.status(400).json({ message: 'You can only submit for the assigned date.' });
+      }
+
+      // ✅ Only allow updating if it's 'not completed' or 'missed'
+      if (existingStatus.status === 'completed') {
+        return res.status(409).json({ message: 'Task is already marked as completed.' });
+      }
+
+      if (existingStatus.status === 'not completed' || existingStatus.status === 'missed') {
+        existingStatus.status = 'completed';
+        existingStatus.completedAt = new Date(); // Now
+        await existingStatus.save();
+
+        return res.status(200).json({
+          success: true,
+          message: 'Task marked as completed.',
+          taskStatus: existingStatus
+        });
+      }
+
+      return res.status(400).json({ message: 'Task status cannot be updated.' });
     }
 
-    // ✅ Check if a status for this user + task + assigned date already exists
     const alreadyExists = await TaskStatus.findOne({
       user: userId,
       task: taskId,
       date: {
         $gte: assignedDate,
-        $lt: new Date(assignedDate.getTime() + 24 * 60 * 60 * 1000), // next midnight
+        $lt: new Date(assignedDate.getTime() + 24 * 60 * 60 * 1000),
       },
     });
 
@@ -379,12 +420,18 @@ const submitTask = async (req, res) => {
       return res.status(409).json({ message: 'Task already marked for this date.' });
     }
 
-    // ✅ Create new status entry
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (assignedDate.toDateString() !== today.toDateString()) {
+      return res.status(400).json({ message: 'You can only submit tasks for today.' });
+    }
+
     const newStatus = new TaskStatus({
       user: userId,
       task: taskId,
-      date: assignedDate,               // which day it was assigned
-      completedAt: new Date(),          // when user completed it
+      date: assignedDate,
+      completedAt: new Date(),
       status: 'completed',
     });
 
@@ -398,6 +445,31 @@ const submitTask = async (req, res) => {
   }
 };
 
+const fetchTasksToCopyForUser = async (req, res) => {
+  try {
+
+    const {userId
+} = req.params; 
+    if (!userId) {
+      return res.status(400).json({ message: 'User ID is required.' });
+
+    }
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found.' });
+    }
+
+    const tasks = await Task.find({ users_assigned: userId });
+   
+    res.json({tasks, message: `Tasks fetched successfully for the user ${user.name}.`});
+  }catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error', error: err.message });
+  }
+}
+
+
+
 
 
 module.exports = {
@@ -407,5 +479,5 @@ module.exports = {
   getTaskByUserId,
   submitTask,
   fetchTaskStatusForUser,
-  
+fetchTasksToCopyForUser
 };

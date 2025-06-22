@@ -58,16 +58,17 @@ export function useApi() {
 }
 
 export function ApiProvider({ children }) {
-
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({});
   const [users, setUsers] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [userTasks, setUserTasks] = useState([]);
+  const [sheetUser, setSheetUser] = useState({});
   const [admin, setAdmin] = useState({});
   const [branches, setBranches] = useState([]);
 
-  const { signup, loginFirebase, logoutFirebase, changePasswordFirebase } = useAuth();
+  const { signup, loginFirebase, logoutFirebase, changePasswordFirebase } =
+    useAuth();
 
   const fetchUserOrAdmin = async () => {
     const admin_uid = getCookie("admin_uid");
@@ -129,6 +130,7 @@ export function ApiProvider({ children }) {
           console.log(data);
           setUser(data.user);
           setCookie("user_uid", user.user.uid);
+          fetchTasksForUser(data.user._id)
           navigate("/user/");
           toast.success(`Welcome back! ${data.user.name}`);
         }
@@ -217,6 +219,16 @@ export function ApiProvider({ children }) {
     }
   };
 
+  const editUser = async (userId, updatedData) => {
+    try {
+      const response = await putRequest(updateUserUrl(userId), updatedData);
+      toast.success(response.message || "User updated successfully");
+      navigate(-1);
+    } catch (err) {
+      handleApiError(err);
+    }
+  };
+
   const createBranch = async (branch) => {
     try {
       const response = await postRequest(createBranchUrl, branch, {
@@ -264,7 +276,7 @@ export function ApiProvider({ children }) {
     try {
       const response = postRequest(addTaskUrl, task, { admin_uid: admin.uid });
       navigate(-1);
-      console.log('assigned task',response);
+      console.log("assigned task", response);
 
       toast.success(response.message);
     } catch (err) {
@@ -310,6 +322,7 @@ export function ApiProvider({ children }) {
       console.log(response);
       console.log(`response for the date ${selectedDate}`, response);
       setTasks([]);
+      setSheetUser(response.user);
       setTasks(response.tasks);
     } catch (err) {
       handleApiError(err);
@@ -336,6 +349,7 @@ export function ApiProvider({ children }) {
   const submitTask = async (taskId, taskStatusId) => {
     setLoading(true);
     try {
+      console.log("Submitting task:", { taskId, taskStatusId });
       const response = await postRequest(
         submitTaskUrl,
         {
@@ -420,6 +434,8 @@ export function ApiProvider({ children }) {
     loading,
     submitTask,
     changePasswordForUser,
+    sheetUser,
+    editUser,
   };
   return (
     <ApiContext.Provider value={value}>

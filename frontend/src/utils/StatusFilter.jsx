@@ -18,7 +18,8 @@ export const getFilteredTaskStatuses = (tasks, selectedDate, statusFilter) => {
         task.frequency === "daily" ||
         (task.frequency === "weekly" && task.days?.includes(dayName)) ||
         (task.frequency === "monthly" && task.dates?.includes(dayNumber)) ||
-        (task.frequency === "once" && taskDate?.getTime() === selected.getTime());
+        (task.frequency === "once" &&
+          taskDate?.getTime() === selected.getTime());
 
       return matchFrequency;
     })
@@ -27,21 +28,38 @@ export const getFilteredTaskStatuses = (tasks, selectedDate, statusFilter) => {
       taskStatusDate?.setHours(0, 0, 0, 0);
 
       const isCompletedToday =
-        sheet.status === "completed" && taskStatusDate && taskStatusDate.getTime() === selected.getTime();
+        sheet.status === "completed" &&
+        taskStatusDate &&
+        taskStatusDate.getTime() === selected.getTime();
+
+      const isMissedToday =
+        sheet.status === "missed" &&
+        taskStatusDate &&
+        taskStatusDate.getTime() === selected.getTime();
 
       let status = "not completed";
       let dateField = "-";
 
       if (selected < today) {
         status = isCompletedToday ? "completed" : "missed";
-        dateField = isCompletedToday ? taskStatusDate.toISOString().split("T")[0] : "-";
+        dateField = isCompletedToday
+          ? taskStatusDate.toISOString().split("T")[0]
+          : "-";
       } else if (selected > today) {
         status = isCompletedToday ? "completed" : "yet to complete";
-        dateField = isCompletedToday ? taskStatusDate.toISOString().split("T")[0] : "-";
+        dateField = isCompletedToday
+          ? taskStatusDate.toISOString().split("T")[0]
+          : "-";
       } else {
-        // today
-        status = isCompletedToday ? "completed" : "not completed";
-        dateField = isCompletedToday ? taskStatusDate.toISOString().split("T")[0] : "-";
+        // Today
+        if (isCompletedToday) {
+          status = "completed";
+          dateField = taskStatusDate.toISOString().split("T")[0];
+        } else if (isMissedToday) {
+          status = "missed";
+        } else {
+          status = "not completed";
+        }
       }
 
       return {

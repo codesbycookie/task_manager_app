@@ -2,11 +2,11 @@ const baseUrl = import.meta.env.VITE_BASE_URL;
 
 const urls = {
   // User URLs
-  registerUserUrl: `${baseUrl}/user-register`,
+  registerUserUrl: `${baseUrl}/user/user-register`,
   loginUserUrl: `${baseUrl}/user/user-login`,
-  updateUserUrl: (userId) => `${baseUrl}/user-update/${userId}`,
-  deleteUserUrl: (userId) => `${baseUrl}/admin/user-delete/${userId}`,
-  fetchUsersUrl: `${baseUrl}/get-all-users`,
+  updateUserUrl: (userId) => `${baseUrl}/user/user-update/${userId}`,
+  deleteUserUrl: (userId) => `${baseUrl}/user/admin/user-delete/${userId}`,
+  fetchUsersUrl: `${baseUrl}/user/get-all-users`,
 
   // Task URLs
   addTaskUrl: `${baseUrl}/tasks/admin/add-task`,
@@ -17,10 +17,10 @@ const urls = {
   submitTaskUrl: `${baseUrl}/tasks/submit-task`,
 
   // Branch URLs
-  createBranchUrl: `${baseUrl}/admin/create-branch`,
-  fetchBranchesUrl: `${baseUrl}/admin/branches`,
-  editBranchUrl: (branchId) => `${baseUrl}/admin/edit-branch/${branchId}`,
-  deleteBranchUrl: (branchId) => `${baseUrl}/admin/delete-branch/${branchId}`,
+  createBranchUrl: `${baseUrl}/branch/admin/create-branch`,
+  fetchBranchesUrl: `${baseUrl}/branch/admin/branches`,
+  editBranchUrl: (branchId) => `${baseUrl}/branch/admin/edit-branch/${branchId}`,
+  deleteBranchUrl: (branchId) => `${baseUrl}/branch/admin/delete-branch/${branchId}`,
 
   // Admin URLs
   loginAdminUrl: `${baseUrl}/admin/admin/login`,

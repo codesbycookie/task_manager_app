@@ -10,7 +10,7 @@ import { getFilteredTaskStatuses } from "../../../utils/StatusFilter";
 export default function AdminSheets() {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { deleteTask, fetchTasksForAdmin, tasks } = useApi();
+  const { deleteTask, fetchTasksForAdmin, tasks, sheetUser } = useApi();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedSheet, setSelectedSheet] = useState(null);
@@ -91,6 +91,23 @@ export default function AdminSheets() {
 
   return (
     <div className="container mt-5">
+      <div className="d-flex">
+        <h3 className="mb-4 me-auto">{sheetUser.name}'s Task Sheet</h3>
+        <h4 className="ms-auto">
+          <strong>Last Logged In:</strong>{" "}
+          {sheetUser.last_login
+            ? new Date(sheetUser.last_login).toLocaleString("en-IN", {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true,
+              })
+            : "Not Yet Logged In"}
+        </h4>
+      </div>
       <div className="d-flex justify-content-between align-items-center mb-4">
         <Button variant="outline-secondary" onClick={goToPreviousMonth}>
           &lt;
@@ -149,18 +166,22 @@ export default function AdminSheets() {
 
       <div className="d-flex align-items-center mb-3">
         <h2 className="m-0">Tasks on {selectedDate.toDateString()}</h2>
-        <Form.Select
-          size="sm"
-          className="ms-3"
-          style={{ width: "200px" }}
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="all">All</option>
-          <option value="completed">Completed</option>
-          <option value="missed">Missed</option>
-          <option value="not completed">Not Completed</option>
-        </Form.Select>
+<Form.Group className="d-flex align-items-center mx-auto">
+  <Form.Label className="me-2 mb-0 fw-bold text-muted">Filter by Status:</Form.Label>
+  <Form.Select
+    size="sm"
+    className="shadow-sm rounded-2 border-secondary"
+    style={{ width: "200px", backgroundColor: "#f8f9fa" }}
+    value={statusFilter}
+    onChange={(e) => setStatusFilter(e.target.value)}
+  >
+    <option value="all">All</option>
+    <option value="completed">✅ Completed</option>
+    <option value="missed">❌ Missed</option>
+    <option value="not completed">⚠️ Not Completed</option>
+  </Form.Select>
+</Form.Group>
+
         <a
           href={`/admin/add-task`}
           className="btn btn-primary ms-auto p-2"
@@ -203,6 +224,8 @@ export default function AdminSheets() {
                       : "table-light"
                   }
                 >
+                  {console.log(sheet.status)}
+
                   <td>{sheet.task.title}</td>
                   <td>{sheet.task.frequency}</td>
                   <td>
@@ -218,12 +241,12 @@ export default function AdminSheets() {
                       return "-";
                     })()}
                   </td>
-                  <td>{sheet.status}</td>
+                  <td>{sheet.status === 'completed' ? '✅ Completed' : sheet.status === 'missed' ? '❌ Missed' : '⚠️ Not Completed'}</td>
                   <td>{new Date(sheet.task.createdAt).toLocaleString()}</td>
                   <td>
                     {sheet.status === "completed"
                       ? sheet.date !== "-"
-                        ? new Date(sheet.date).toLocaleString()
+                        ? new Date(sheet.completedAt).toLocaleString()
                         : "-"
                       : "not yet completed"}
                   </td>
@@ -250,14 +273,14 @@ export default function AdminSheets() {
                 <tr>
                   <td colSpan="7" className="text-center">
                     No tasks for this {selectedDate.toLocaleDateString()}
-<br />
+                    <br />
                     <a
-          href={`/admin/add-task`}
-          className="btn btn-primary ms-auto p-2 mt-3"
-          style={{ height: "40px" }}
-        >
-          Add Task for today 
-        </a>
+                      href={`/admin/add-task`}
+                      className="btn btn-primary ms-auto p-2 mt-3"
+                      style={{ height: "40px" }}
+                    >
+                      Add Task for today
+                    </a>
                   </td>
                 </tr>
               )}

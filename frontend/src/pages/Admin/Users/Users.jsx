@@ -33,15 +33,45 @@ export default function Users() {
             <div className="card shadow-sm h-100">
               <div className="card-body">
                 <h5 className="card-title">{user.name}</h5>
-                <p className="card-text"><strong>Email:</strong> {user.email}</p>
-                <p className="card-text"><strong>Branch:</strong> {user.branch ? user.branch.name : 'Branch may be deleted'}</p>
-                <p className="card-text"><strong>Phone:</strong> {user.phone_number}</p>
-                <p className="card-text"><strong>Address:</strong> {user.address}</p>
+                <p className="card-text">
+                  <strong>Email:</strong> {user.email}
+                </p>
+                <p className="card-text">
+                  <strong>Branch:</strong>{" "}
+                  {user.branch ? user.branch.name : "Branch may be deleted"}
+                </p>
+                <p className="card-text">
+                  <strong>Phone:</strong> {user.phone_number}
+                </p>
+                <p className="card-text">
+                  <strong>Address:</strong> {user.address}
+                </p>
+                <p className="card-text">
+                  <strong>Last Logged on:</strong>{" "}
+                  {user.last_login
+                    ? new Date(user.last_login).toLocaleString("en-IN", {
+                        year: "numeric",
+                        month: "short",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                        hour12: true,
+                      })
+                    : "Not Yet Logged In"}
+                </p>
+
                 <div className="d-flex justify-content-between mt-3">
-                  <a className="btn btn-green" href={`/admin/users/sheets/${user._id}`}>
+                  <a
+                    className="btn btn-green"
+                    href={`/admin/users/sheets/${user._id}`}
+                  >
                     View Sheet
                   </a>
-                  <button className="btn btn-danger" onClick={() => confirmDelete(user)}>
+                  <button
+                    className="btn btn-danger"
+                    onClick={() => confirmDelete(user)}
+                  >
                     Delete
                   </button>
                 </div>
@@ -52,7 +82,11 @@ export default function Users() {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>

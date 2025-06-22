@@ -3,7 +3,7 @@ import { useApi } from '../../../context/ApiContext';
 import './EditProfile.css'; // 👈 Importing external CSS
 
 export default function EditProfile() {
-  const { user } = useApi();
+  const { user, editUser } = useApi();
 
   const [formData, setFormData] = useState({
     name: '',
@@ -31,6 +31,7 @@ export default function EditProfile() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    editUser(user._id, formData)
     // TODO: submit form data
   };
 
@@ -51,8 +52,8 @@ export default function EditProfile() {
         <label>Address</label>
         <textarea name="address" value={formData.address} onChange={handleChange}></textarea>
 
-        <label>Branch</label>
-        <input type="text" name="branch" value={formData.branch} onChange={handleChange} />
+        <label>Branch Id</label>
+        <input type="text" name="branch" value={formData.branch} disabled onChange={handleChange} />
 
         <button type="submit">Save Changes</button>
       </form>

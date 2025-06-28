@@ -112,19 +112,19 @@ const editTask = async (req, res) => {
     }
 
     // Sync task status for updated users_assigned
-    if (updateData.users_assigned && Array.isArray(updateData.users_assigned)) {
-      // Delete all old statuses
-      await TaskStatus.deleteMany({ task: taskId });
+    // if (updateData.users_assigned && Array.isArray(updateData.users_assigned)) {
+    //   // Delete all old statuses
+    //   await TaskStatus.deleteMany({ task: taskId });
 
-      // Create new statuses
-      const newStatuses = updateData.users_assigned.map(userId => ({
-        task: taskId,
-        user: userId,
-        status: 'not completed', // default status
-      }));
+    //   // Create new statuses
+    //   const newStatuses = updateData.users_assigned.map(userId => ({
+    //     task: taskId,
+    //     user: userId,
+    //     status: 'not completed', // default status
+    //   }));
 
-      await TaskStatus.insertMany(newStatuses);
-    }
+    //   await TaskStatus.insertMany(newStatuses);
+    // }
 
     res.status(200).json({
       message: "Task updated successfully",

@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useApi } from "../../context/ApiContext";
 import "./Login.css"; // minimal override
+import { FaUserShield, FaUser, FaSignInAlt } from "react-icons/fa";
 
 export default function Login() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({});
   const { login } = useApi();
+  const [isFlipped, setIsFlipped] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
@@ -49,59 +51,103 @@ export default function Login() {
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  return (
-    <div className="container-fluid d-flex justify-content-center align-items-center vh-100 login-bg">
-      <div className="card shadow p-4" style={{ maxWidth: "400px", width: "100%" }}>
-        <h3 className="text-center mb-4">Login</h3>
+  const toggleRole = () => {
+    setIsFlipped(!isFlipped);
+    setTimeout(() => setIsAdmin(!isAdmin), 300); // Sync with animation
+  };
 
-        <div className="form-check form-switch d-flex justify-content-center mb-3">
-          <input
-            className="form-check-input custom-switch"
-            type="checkbox"
-            id="roleSwitch"
-            checked={isAdmin}
-            onChange={() => setIsAdmin(!isAdmin)}
-          />
-          <label className="form-check-label ms-2" htmlFor="roleSwitch">
-            {isAdmin ? "Logging in as Admin" : "Logging in as User"}
-          </label>
+  return (
+    <div className="login-container">
+      <div className={`login-card ${isFlipped ? "flipped" : ""}`}>
+        {/* Front Side - User Login */}
+        <div className="login-card-front">
+          <div className="login-header">
+            <FaUser size={32} className="user-icon" />
+            <h3>User Login</h3>
+          </div>
+          
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <label htmlFor="email">Email address</label>
+              <input
+                type="email"
+                className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                id="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="name@example.com"
+              />
+              {errors.email && <div className="error-message">{errors.email}</div>}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <input
+                type="password"
+                className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                id="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+              />
+              {errors.password && <div className="error-message">{errors.password}</div>}
+            </div>
+
+            <button type="submit" className="login-button">
+              <FaSignInAlt className="me-2" />
+              Login as User
+            </button>
+          </form>
+
+          <button className="switch-button" onClick={toggleRole}>
+            Switch to Admin Login
+          </button>
         </div>
 
-        <form onSubmit={handleLogin}>
-          <div className="mb-3">
-            <label htmlFor="email" className="form-label">
-              Email address
-            </label>
-            <input
-              type="email"
-              className={`form-control ${errors.email ? "is-invalid" : ""}`}
-              id="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="name@example.com"
-            />
-            {errors.email && <div className="text-danger small">{errors.email}</div>}
+        {/* Back Side - Admin Login */}
+        <div className="login-card-back">
+          <div className="login-header">
+            <FaUserShield size={32} className="admin-icon" />
+            <h3>Admin Login</h3>
           </div>
+          
+          <form onSubmit={handleLogin}>
+            <div className="form-group">
+              <label htmlFor="email">Admin Email</label>
+              <input
+                type="email"
+                className={`form-control ${errors.email ? "is-invalid" : ""}`}
+                id="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="admin@example.com"
+              />
+              {errors.email && <div className="error-message">{errors.email}</div>}
+            </div>
 
-          <div className="mb-3">
-            <label htmlFor="password" className="form-label">
-              Password
-            </label>
-            <input
-              type="password"
-              className={`form-control ${errors.password ? "is-invalid" : ""}`}
-              id="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-            />
-            {errors.password && <div className="text-danger small">{errors.password}</div>}
-          </div>
+            <div className="form-group">
+              <label htmlFor="password">Admin Password</label>
+              <input
+                type="password"
+                className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                id="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="••••••••"
+              />
+              {errors.password && <div className="error-message">{errors.password}</div>}
+            </div>
 
-          <button type="submit" className="btn login-btn w-100 mt-3">
-            Login
+            <button type="submit" className="login-button">
+              <FaSignInAlt className="me-2" />
+              Login as Admin
+            </button>
+          </form>
+
+          <button className="switch-button" onClick={toggleRole}>
+            Switch to User Login
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );

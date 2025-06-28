@@ -12,7 +12,7 @@ export default function EditTask() {
 
   // Get task from location state
   const task = location.state?.task;
-
+  const user = location.state?.user;
   const [title, setTitle] = useState("");
   const [frequency, setFrequency] = useState("");
   const [date, setDate] = useState("");
@@ -102,7 +102,7 @@ export default function EditTask() {
     };
 
     try {
-      await editTask(updatedTask);
+      await editTask(updatedTask,user);
     } catch (error) {
       console.error(error);
       alert("Failed to update task");

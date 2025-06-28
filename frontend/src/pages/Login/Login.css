@@ -1,18 +1,127 @@
-.login-bg {
-  background-color: #ffffff;
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
 }
 
-.login-btn {
-  background-color: #8dc540;
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  position: relative;
+  bottom: 200px;
+}
+
+.login-card.flipped {
+  transform: rotateY(180deg);
+}
+
+.login-card-front,
+.login-card-back {
+  backface-visibility: hidden;
+  position: absolute;
+  width: 100%;
+  padding: 2rem;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.login-card-back {
+  transform: rotateY(180deg);
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.login-header h3 {
+  margin-top: 1rem;
+  color: #333;
+}
+
+.user-icon {
+  color: #4e73df;
+}
+
+.admin-icon {
+  color: #e74a3b;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #5a5c69;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d1d3e2;
+  border-radius: 0.35rem;
+  transition: border-color 0.3s;
+}
+
+.form-control:focus {
+  border-color: #bac8f3;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.is-invalid {
+  border-color: #e74a3b;
+}
+
+.error-message {
+  color: #e74a3b;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.login-button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #4e73df;
+  border: none;
+  border-radius: 0.35rem;
   color: white;
-  font-weight: 500;
-  transition: background 0.3s ease;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.login-btn:hover {
-  background-color: #7bb138;
+.login-button:hover {
+  background-color: #2e59d9;
 }
 
-.custom-switch {
-  accent-color: #fac116;
+.switch-button {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  background: transparent !important;
+  border: none;
+  color: #4e73df;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.3s;
+  text-decoration: underline !important;
+}
+
+.switch-button:hover {
+  color: #2e59d9;
+  text-decoration: underline;
 }

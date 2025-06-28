@@ -130,7 +130,7 @@ export function ApiProvider({ children }) {
           console.log(data);
           setUser(data.user);
           setCookie("user_uid", user.user.uid);
-          fetchTasksForUser(data.user._id)
+          
           navigate("/user/");
           toast.success(`Welcome back! ${data.user.name}`);
         }
@@ -284,13 +284,14 @@ export function ApiProvider({ children }) {
     }
   };
 
-  const editTask = async (task) => {
+  const editTask = async (task,user) => {
     try {
       console.log("Updated data:", task);
       const res = await putRequest(editTaskUrl(task._id), task, {
         admin_uid: admin.uid,
       });
       toast.success(res.message);
+      fetchTasksForAdmin(user._id);
       navigate(-1);
     } catch (err) {
       handleApiError(err);
@@ -305,14 +306,14 @@ export function ApiProvider({ children }) {
         { admin_uid: admin.uid }
       );
       toast.success(response.message);
-      fetchTasksForAdmin(userId, selectedDate);
+      fetchTasksForAdmin(userId);
       console.log(response);
     } catch (err) {
       handleApiError(err);
     }
   };
 
-  const fetchTasksForAdmin = async (userId, selectedDate) => {
+  const fetchTasksForAdmin = async (userId) => {
     try {
       const response = await getRequest(
         getTasksForAdminUrl(userId),
@@ -320,7 +321,6 @@ export function ApiProvider({ children }) {
         { admin_uid: admin.uid }
       );
       console.log(response);
-      console.log(`response for the date ${selectedDate}`, response);
       setTasks([]);
       setSheetUser(response.user);
       setTasks(response.tasks);
@@ -332,8 +332,9 @@ export function ApiProvider({ children }) {
   const fetchTasksForUser = async () => {
     setLoading(true);
     try {
+      
       const response = await getRequest(
-        getTasksForUserUrl(user._id),
+        getTasksForUserUrl( user._id),
         {},
         { user_uid: user._id }
       );

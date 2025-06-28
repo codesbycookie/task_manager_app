@@ -8,7 +8,7 @@ export default function UserSheets() {
 
   useEffect(() => {
     if (user?._id) fetchTasksForUser(user?._id);
-  }, [user._id]);
+  }, []);
 
   const handleSubmitTask = async (e, taskId, taskStatusId) => {
     e.preventDefault();

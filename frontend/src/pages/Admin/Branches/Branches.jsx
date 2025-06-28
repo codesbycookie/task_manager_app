@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Badge, Spinner } from 'react-bootstrap';
 import { useApi } from '../../../context/ApiContext';
-import './Branches.css'
+import { FaBuilding, FaEdit, FaTrash, FaPlus, FaUsers, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 
 export default function Branches() {
   const { branches, deleteBranch } = useApi();
@@ -26,42 +26,74 @@ export default function Branches() {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="d-flex mb-4">
-        <h2>Branches</h2>
-        <a href={`/admin/add-branch`} className="btn btn-primary ms-auto p-2">
+    <div className="container py-4">
+      {/* Header Section */}
+      <div className="d-flex flex-column flex-md-row align-items-center justify-content-between mb-4">
+        <div className="d-flex align-items-center mb-3 mb-md-0">
+          <FaBuilding className=" me-3" size={28} style={{color: '#8dc540'}} />
+          <h2 className="m-0">Branches</h2>
+        </div>
+        <a 
+          href="/admin/add-branch" 
+          className="btn d-flex align-items-center px-3 px-md-4 py-2"
+          style={{backgroundColor: '#8dc540'}}
+        >
+          <FaPlus className="me-2" />
           Add Branch
         </a>
       </div>
 
-      <div className="row">
+      {/* Branches Grid */}
+      <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {branches.map((branch) => (
-          <div className="col-md-4 mb-4" key={branch._id}>
-            <div className="card shadow-sm h-100">
-              <div className="card-body">
-                <h5 className="card-title">{branch.name}</h5>
-                <p><strong>Address:</strong> {branch.address}</p>
-                <p><strong>Phone:</strong> {branch.phone_number}</p>
-                <p><strong>Members:</strong> {branch.members_count}</p>
-                <p className="text-muted">
-                  <small>Updated: {new Date(branch.updatedAt).toLocaleString()}</small>
-                </p>
-                <div className="d-flex justify-content-end gap-2 mt-3">
-                  <button
-                    className="btn btn-sm btn-outline-primary"
-                    onClick={() => navigate('/admin/edit-branch', { state: { branch } })}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={() => {
-                      setSelectedBranch(branch);
-                      setShowDeleteModal(true);
-                    }}
-                  >
-                    Delete
-                  </button>
+          <div className="col" key={branch._id}>
+            <div className="card h-100 shadow-sm border-0">
+              <div className="card-body d-flex flex-column">
+                <div className="d-flex justify-content-between align-items-start mb-3">
+                  <h5 className="card-title mb-0 text-truncate">{branch.name}</h5>
+                  <Badge bg="light" text="dark" className="border">
+                    {branch.members_count} <FaUsers className="ms-1" />
+                  </Badge>
+                </div>
+                
+                <div className="mb-3 flex-grow-1">
+                  <p className="mb-2">
+                    <FaMapMarkerAlt className="text-muted me-2" />
+                    <strong>Address:</strong> {branch.address}
+                  </p>
+                  <p className="mb-2">
+                    <FaPhone className="text-muted me-2" />
+                    <strong>Phone:</strong> {branch.phone_number}
+                  </p>
+                </div>
+                
+                <div className="mt-auto">
+                  <p className="text-muted small mb-2">
+                    Updated: {new Date(branch.updatedAt).toLocaleString()}
+                  </p>
+                  <div className="d-flex justify-content-end gap-2">
+                    <Button
+                      variant=""
+                      size="sm"
+                      onClick={() => navigate('/admin/edit-branch', { state: { branch } })}
+                      className="d-flex align-items-center"
+                    >
+                      <FaEdit className="me-1" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant=""
+                      size="sm"
+                      onClick={() => {
+                        setSelectedBranch(branch);
+                        setShowDeleteModal(true);
+                      }}
+                      className="d-flex align-items-center"
+                    >
+                      <FaTrash className="me-1" />
+                      Delete
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -69,24 +101,41 @@ export default function Branches() {
         ))}
       </div>
 
-      {/* React-Bootstrap Modal for delete confirmation */}
-      <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        centered
-      >
-        <Modal.Header closeButton>
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+        <Modal.Header closeButton className="border-0 pb-0">
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete <strong>{selectedBranch?.name}</strong>?
+        <Modal.Body className="py-4">
+          <div className="text-center mb-3">
+            <div className="bg-danger bg-opacity-10 d-inline-flex p-3 rounded-circle mb-3">
+              <FaTrash size={32} className="text-danger" />
+            </div>
+            <p>Are you sure you want to delete <strong className="text-primary">"{selectedBranch?.name}"</strong>?</p>
+          </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+        <Modal.Footer className="border-0 pt-0">
+          <Button 
+            variant="outline-secondary" 
+            onClick={() => setShowDeleteModal(false)}
+            className="px-4"
+          >
             Cancel
           </Button>
-          <Button variant="danger" onClick={handleDelete} disabled={deleting}>
-            {deleting ? 'Deleting...' : 'Delete'}
+          <Button 
+            variant="danger" 
+            onClick={handleDelete} 
+            disabled={deleting}
+            className="px-4 d-flex align-items-center"
+          >
+            {deleting ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />
+                Deleting...
+              </>
+            ) : (
+              'Delete'
+            )}
           </Button>
         </Modal.Footer>
       </Modal>

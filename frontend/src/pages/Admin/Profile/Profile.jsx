@@ -5,12 +5,12 @@ export default function AdminProfile() {
   const { admin } = useApi();
 
   return (
-    <div className="container d-flex justify-content-center align-items-center min-vh-90 bg-light">
+    <div className="container d-flex justify-content-center align-items-center min-vh-90 ">
   <div className="profile-card card border-0 p-4 w-100" style={{ 
     maxWidth: "500px",
     borderRadius: "15px",
     boxShadow: "0 10px 30px rgba(0, 0, 0, 0.1)",
-    background: "linear-gradient(to bottom right, #ffffff, #f8f9fa)"
+    background: "#fff",
   }}>
     <div className="text-center mb-4">
       <img src="../download.png" alt="" height={80} width={80} className="profile-pic"/>

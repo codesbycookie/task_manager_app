@@ -1,0 +1,7 @@
+@media (max-width: 730px) {
+  /* Your responsive styles here */
+tr,td{
+    min-width: 150px;
+ }
+  /* Add more custom rules as needed */
+}

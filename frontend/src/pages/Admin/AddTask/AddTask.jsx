@@ -37,14 +37,19 @@ export default function AddTask() {
   ];
 
   const dayOptions = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
+  { label: "Sunday", value: "Sunday" },
+  { label: "Monday", value: "Monday" },
+  { label: "Tuesday", value: "Tuesday" },
+  { label: "Wednesday", value: "Wednesday" },
+  { label: "Thursday", value: "Thursday" },
+  { label: "Friday", value: "Friday" },
+  { label: "Saturday", value: "Saturday" },
+];
+
+const presetGroups = [
+  { label: "Mon, Wed, Fri", value: ["Monday", "Wednesday", "Friday"] },
+  { label: "Tue, Thu, Sat", value: ["Tuesday", "Thursday", "Saturday"] },
+];
 
   const toggleDay = (day) => {
     setDays((prev) =>
@@ -169,24 +174,46 @@ export default function AddTask() {
       )}
 
       {frequency === "weekly" && (
-        <div className="mb-3">
-          <label className="form-label d-block">Select Days of the Week</label>
-          {dayOptions.map((day) => (
-            <div className="form-check form-check-inline" key={day}>
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id={`day-${day}`}
-                checked={days.includes(day)}
-                onChange={() => toggleDay(day)}
-              />
-              <label className="form-check-label" htmlFor={`day-${day}`}>
-                {day}
-              </label>
-            </div>
-          ))}
-        </div>
-      )}
+  <div className="mb-3">
+    <label className="form-label d-block">Select Days of the Week</label>
+
+    {/* Preset Buttons */}
+    {presetGroups.map((group) => (
+      <button
+        type="button"
+        style={{color:'white'}}
+        key={group.label}
+        className="btn btn-outline-secondary btn-sm me-2 mb-2"
+        onClick={() => {
+          const alreadySelected = group.value.every((d) => days.includes(d));
+          setDays((prev) =>
+            alreadySelected
+              ? prev.filter((d) => !group.value.includes(d)) // remove group
+              : [...new Set([...prev, ...group.value])] // add group
+          );
+        }}
+      >
+        {group.label}
+      </button>
+    ))}
+
+    {/* Custom Day Selection */}
+    {dayOptions.map((day) => (
+      <div className="form-check form-check-inline" key={day.value}>
+        <input
+          className="form-check-input"
+          type="checkbox"
+          id={`day-${day.value}`}
+          checked={days.includes(day.value)}
+          onChange={() => toggleDay(day.value)}
+        />
+        <label className="form-check-label" htmlFor={`day-${day.value}`}>
+          {day.label}
+        </label>
+      </div>
+    ))}
+  </div>
+)}
 
       {frequency === "monthly" && (
         <div className="mb-3">

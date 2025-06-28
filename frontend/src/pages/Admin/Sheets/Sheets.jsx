@@ -2,9 +2,9 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Modal, Button, Spinner, Form, Badge } from "react-bootstrap";
 import { useApi } from "../../../context/ApiContext";
-import "./Sheets.css";
 import { MdOutlineEdit, MdDelete, MdAdd, MdChevronLeft, MdChevronRight, MdToday } from "react-icons/md";
 import { getFilteredTaskStatuses } from "../../../utils/StatusFilter";
+import "./Sheets.css"; // Import custom styles
 
 export default function AdminSheets() {
   const { userId } = useParams();
@@ -231,8 +231,8 @@ export default function AdminSheets() {
         </div>
       </div>
 
-      {/* Tasks Section */}
-      <div className="card shadow-sm border-0 overflow-hidden">
+      {/* Tasks Section with Scrollable Table Body */}
+      <div className="card shadow-sm border-0">
         <div className="card-header bg-white border-0 pt-4 pb-3">
           <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between">
             <div className="mb-3 mb-md-0">
@@ -270,9 +270,9 @@ export default function AdminSheets() {
               <p className="mt-3 text-muted">Loading tasks...</p>
             </div>
           ) : (
-            <div className="table-responsive">
+            <div className="table-responsive" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
               <table className="table table-hover align-middle mb-0">
-                <thead className="bg-light">
+                <thead className="bg-light sticky-top">
                   <tr>
                     <th className="ps-4">Task Title</th>
                     <th>Frequency</th>
@@ -285,8 +285,14 @@ export default function AdminSheets() {
                 </thead>
                 <tbody>
                   {filteredTasks.map((sheet) => (
-                    <tr key={sheet._id} className={sheet.status === "completed" ? "bg-success bg-opacity-10" : 
-                                                 sheet.status === "missed" ? "bg-danger bg-opacity-10" : ""}>
+                    <tr 
+                      key={sheet._id} 
+                      className={
+                        sheet.status === "completed" ? "bg-success bg-opacity-10" : 
+                        sheet.status === "missed" ? "bg-danger bg-opacity-10" : ""
+                      }
+                      style={{ height: '60px' }} // Fixed row height
+                    >
                       <td className="ps-4 fw-semibold">{sheet.task.title}</td>
                       <td>
                         <Badge bg="secondary" className="text-capitalize">
@@ -323,13 +329,14 @@ export default function AdminSheets() {
                           <span className="text-muted">-</span>
                         )}
                       </td>
-                      <td className="pe-4 text-end">
+                      <td className="pe-4 text-end" id="table-actions">
                         <Button
                           variant="outline-secondary"
                           size="sm"
                           onClick={() => handleEdit(sheet.task)}
                           className="me-2 rounded-circle"
                           style={{ width: '32px', height: '32px' }}
+                          id="table-button"
                         >
                           <MdOutlineEdit size={16} />
                         </Button>
@@ -339,6 +346,7 @@ export default function AdminSheets() {
                           onClick={() => handleDeleteClick(sheet)}
                           className="rounded-circle"
                           style={{ width: '32px', height: '32px' }}
+                          id="table-button"
                         >
                           <MdDelete size={16} />
                         </Button>
@@ -346,7 +354,7 @@ export default function AdminSheets() {
                     </tr>
                   ))}
                   {filteredTasks.length === 0 && (
-                    <tr>
+                    <tr style={{ height: '200px' }}>
                       <td colSpan="7" className="text-center py-5">
                         <div className="d-flex flex-column align-items-center justify-content-center">
                           <img 

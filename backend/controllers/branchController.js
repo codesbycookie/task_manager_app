@@ -68,14 +68,16 @@ const deleteBranch = async (req, res) => {
   try {
     const { branchId } = req.params;
 
-    const deletedBranch = await Branch.findByIdAndDelete(branchId);
-    if (!deletedBranch) {
+    const branch = await Branch.findById(branchId);
+    if (!branch) {
       return res.status(404).json({ message: 'Branch not found.' });
     }
 
-    if (deletedBranch.members_count > 0) {
+    if (branch.members_count > 0) {
       return res.status(400).json({ message: 'Cannot delete branch with members.' });
     }
+
+    const deletedBranch = await Branch.findByIdAndDelete(branchId);
 
     res.status(200).json({
       message: 'Branch deleted successfully.',

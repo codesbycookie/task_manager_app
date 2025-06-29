@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
 import { useContext, createContext, useState, useEffect } from "react";
-import { auth } from "../firebase/Firebase";
+import { auth } from "../firebase/firebase";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,

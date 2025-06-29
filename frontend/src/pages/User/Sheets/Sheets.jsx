@@ -56,7 +56,7 @@ export default function UserSheets() {
 
       {/* Rest of the component remains the same with small adjustment to checkbox handling */}
       <div className="d-flex flex-column flex-md-row align-items-center justify-content-between mb-4">
-        <h3 className="mb-3 mb-md-0 text-primary fw-bold">Your Today's Task Sheet</h3>
+        <h3 className="mb-3 mb-md-0 fw-bold" style={{color: '#8dc540'}}>Your Today's Task Sheet</h3>
         <button 
           className="btn btn-primary px-4 py-2 shadow-sm" 
           onClick={fetchTasksForUser} 

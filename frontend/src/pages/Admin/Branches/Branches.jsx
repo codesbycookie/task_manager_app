@@ -35,7 +35,7 @@ export default function Branches() {
         </div>
         <a 
           href="/admin/add-branch" 
-          className="btn d-flex align-items-center px-3 px-md-4 py-2"
+          className="btn d-flex align-items-center px-3 px-md-4 py-2 text-white"
           style={{backgroundColor: '#8dc540'}}
         >
           <FaPlus className="me-2" />
@@ -76,7 +76,7 @@ export default function Branches() {
                       variant=""
                       size="sm"
                       onClick={() => navigate('/admin/edit-branch', { state: { branch } })}
-                      className="d-flex align-items-center"
+                      className="d-flex align-items-center text-white"
                     >
                       <FaEdit className="me-1" />
                       Edit
@@ -88,7 +88,7 @@ export default function Branches() {
                         setSelectedBranch(branch);
                         setShowDeleteModal(true);
                       }}
-                      className="d-flex align-items-center"
+                      className="d-flex align-items-center bg-danger text-white"
                     >
                       <FaTrash className="me-1" />
                       Delete
@@ -118,7 +118,7 @@ export default function Branches() {
           <Button 
             variant="outline-secondary" 
             onClick={() => setShowDeleteModal(false)}
-            className="px-4"
+            className="px-4 text-white"
           >
             Cancel
           </Button>
@@ -126,7 +126,7 @@ export default function Branches() {
             variant="danger" 
             onClick={handleDelete} 
             disabled={deleting}
-            className="px-4 d-flex align-items-center"
+            className="px-4 d-flex align-items-center bg-danger text-white"
           >
             {deleting ? (
               <>

@@ -166,9 +166,9 @@ export default function Users() {
                     View Sheet
                   </a>
                   <button
-                    className="btn btn-sm d-flex align-items-center"
+                    className="btn btn-sm d-flex align-items-center text-white bg-danger"
                     onClick={() => confirmDelete(user)}
-                    style={{backgroundColor: '#dc3545', color: 'white'}}
+                    
                   >
                     <FaTrash className="me-1" />
                     Delete
@@ -202,7 +202,7 @@ export default function Users() {
           <Button 
             variant="outline-secondary" 
             onClick={() => setShowDeleteModal(false)}
-            className="px-4"
+            className="px-4 text-white"
           >
             Cancel
           </Button>
@@ -210,7 +210,7 @@ export default function Users() {
             variant="danger" 
             onClick={handleDelete}
             disabled={deleting}
-            className="px-4 d-flex align-items-center"
+            className="px-4 d-flex align-items-center bg-danger text-white"
           >
             {deleting ? (
               <>

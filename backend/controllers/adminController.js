@@ -8,7 +8,6 @@ const Branch = require('../models/branch')
 const adminLogin = async(req, res) => {
     try {
         const {uid} = req.body;
-        console.log(uid)
         const admin = await Admin.findOne({uid: uid});
         if(!admin){
             return res.status(404).json({ message: 'Admin not found.' });

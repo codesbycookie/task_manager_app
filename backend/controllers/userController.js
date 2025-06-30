@@ -77,7 +77,6 @@ const userRegister = async (req, res) => {
       tasksToCopy = []
     } = req.body;
 
-    console.log({ name, email, branchId, phone_number, copyFromUserId, uid, address, tasksToCopy });
 
     // Create new user
     const user = new User({ name, email, branch: branchId, phone_number, uid, address });
@@ -161,7 +160,6 @@ const deleteUser = async (req, res) => {
 const getAllUsers = async(req, res) => {
     try {
         const users = await User.find({}).populate('branch');
-        console.log(users)
         res.status(200).json({ message: 'Users fetched successfully', users });
     } catch (err) {
         res.status(500).json({ message: err.message });

@@ -111,20 +111,7 @@ const editTask = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    // Sync task status for updated users_assigned
-    // if (updateData.users_assigned && Array.isArray(updateData.users_assigned)) {
-    //   // Delete all old statuses
-    //   await TaskStatus.deleteMany({ task: taskId });
 
-    //   // Create new statuses
-    //   const newStatuses = updateData.users_assigned.map(userId => ({
-    //     task: taskId,
-    //     user: userId,
-    //     status: 'not completed', // default status
-    //   }));
-
-    //   await TaskStatus.insertMany(newStatuses);
-    // }
 
     res.status(200).json({
       message: "Task updated successfully",
@@ -143,7 +130,6 @@ const deleteTask = async (req, res) => {
   try {
     const { taskStatusId } = req.params;
 
-    console.log(taskStatusId)
 
     const deletedTaskStatus = await TaskStatus.findByIdAndDelete(taskStatusId).populate('task');
 
@@ -175,103 +161,17 @@ const deleteTask = async (req, res) => {
 };
 
 
-const getTaskByUserId2 = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const { date } = req.query;
-
-    if (!date) {
-      return res.status(400).json({ message: "Date is required" });
-    }
-
-    const selectedDate = new Date(date);
-    selectedDate.setHours(0, 0, 0, 0);
-
-    const now = new Date();
-    now.setHours(0, 0, 0, 0);
-
-    const weekdayNames = [
-      "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
-    ];
-    const selectedWeekday = weekdayNames[selectedDate.getDay()];
-    const selectedDay = selectedDate.getDate();
-
-    const tasks = await Task.find({ users_assigned: userId });
-
-    const filteredTasks = tasks.filter((task) => {
-      if (task.frequency === "daily") return true;
-
-      if (task.frequency === "weekly" && task.days?.includes(selectedWeekday)) return true;
-
-      if (task.frequency === "monthly" && task.dates?.includes(selectedDay)) return true;
-
-      if (task.frequency === "once" && task.date) {
-        const taskDate = new Date(task.date);
-        taskDate.setHours(0, 0, 0, 0);
-        return taskDate.getTime() === selectedDate.getTime();
-      }
-
-      return false;
-    });
-
-    if (!filteredTasks || filteredTasks.length === 0) {
-      return res.status(404).json({ message: "No applicable tasks for this date" });
-    }
-
-    // 3. Fetch TaskStatus entries for this date
-    const taskStatusOnDate = await TaskStatus.find({
-      user: userId,
-      date: selectedDate,
-    }).populate('task').populate('user');
-
-    // 4. Build final response
-    const tasksWithStatus = filteredTasks.map(task => {
-      const status = taskStatusOnDate.find(
-        (s) => s.task._id.toString() === task._id.toString()
-      );
-
-      let computedStatus = "not completed";
-      if (status?.completed) computedStatus = "completed";
-      else if (selectedDate < now) computedStatus = "missed";
-
-      return {
-        task,
-        taskStatus: status || null,
-        status: computedStatus,
-      };
-    });
-
-    res.status(200).json({
-      message: "Tasks retrieved successfully",
-      tasks: tasksWithStatus,
-    });
-
-  } catch (err) {
-    console.error("Error in getTaskByUserId:", err);
-    res.status(500).json({ message: "Server Error", error: err.message });
-  }
-};
-
-
-
-
-
 
 const getTaskByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
 
-        const user = await User.findById(userId);
+    const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-
     const statuses = await TaskStatus.find({ user: userId }).populate('task').populate('user');
-
-
-
-    console.log({statuses, user})
 
     res.status(200).json({ tasks: statuses, user: user });
 
@@ -291,8 +191,6 @@ const fetchTaskStatusForUser = async (req, res) => {
 
     const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
     const dayNumber = today.getDate();
-
-    console.log({ dayName, dayNumber, today: today.toLocaleDateString() });
 
     // Define start and end of today
     const startOfDay = new Date(today);
@@ -365,8 +263,6 @@ const fetchTaskStatusForUser = async (req, res) => {
 const submitTask = async (req, res) => {
   try {
     const { userId, taskId, taskStatusId, date } = req.body;
-
-    console.log({ userId, taskId, taskStatusId, date });
 
     if (!userId || !taskId || !date) {
       return res.status(400).json({ message: 'userId, taskId, and date are required.' });
@@ -448,8 +344,8 @@ const submitTask = async (req, res) => {
 const fetchTasksToCopyForUser = async (req, res) => {
   try {
 
-    const {userId
-} = req.params; 
+    const { userId
+    } = req.params;
     if (!userId) {
       return res.status(400).json({ message: 'User ID is required.' });
 
@@ -460,16 +356,13 @@ const fetchTasksToCopyForUser = async (req, res) => {
     }
 
     const tasks = await Task.find({ users_assigned: userId });
-   
-    res.json({tasks, message: `Tasks fetched successfully for the user ${user.name}.`});
-  }catch (err) {
+
+    res.json({ tasks, message: `Tasks fetched successfully for the user ${user.name}.` });
+  } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 }
-
-
-
 
 
 module.exports = {
@@ -479,5 +372,5 @@ module.exports = {
   getTaskByUserId,
   submitTask,
   fetchTaskStatusForUser,
-fetchTasksToCopyForUser
+  fetchTasksToCopyForUser
 };

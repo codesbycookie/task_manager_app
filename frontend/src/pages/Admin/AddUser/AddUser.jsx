@@ -3,7 +3,7 @@ import { useApi } from "../../../context/ApiContext";
 import "./AddUser.css";
 
 export default function AddUser() {
-  const { addUser, users, branches } = useApi();
+  const { addUser, users, branches, fetchTasksForAddUserPage } = useApi();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -27,12 +27,8 @@ export default function AddUser() {
 
     if (name === "copyFromUserId") {
       try {
-        const res = await fetch(
-          `http://localhost:3000/api/tasks/admin/tasks-to-copy/${value}`
-        ); // replace with your actual route
-        const data = await res.json();
-        console.log("Fetched Tasks:", data);
-        setTaskOptions(data.tasks || []); // assuming the response has a 'tasks' field
+        const tasks = await fetchTasksForAddUserPage(value)
+        setTaskOptions(tasks || []); 
         setSelectedUserTasks([]);
       } catch (err) {
         console.error("Failed to fetch user tasks", err);
@@ -59,7 +55,6 @@ export default function AddUser() {
     };
 
     addUser(payload);
-    console.log("Submitted User:", payload);
 
     // Reset
     setFormData({

@@ -4,30 +4,22 @@ import { Modal, Button, Spinner, Form, Badge } from "react-bootstrap";
 import { useApi } from "../../../context/ApiContext";
 import { MdOutlineEdit, MdDelete, MdAdd, MdChevronLeft, MdChevronRight, MdToday } from "react-icons/md";
 import { getFilteredTaskStatuses } from "../../../utils/StatusFilter";
-import "./Sheets.css"; // Import custom styles
+import "./Sheets.css"; 
 
 export default function AdminSheets() {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { deleteTask, fetchTasksForAdmin, tasks, sheetUser } = useApi();
+  const { deleteTask, fetchTasksForAdmin, tasks, sheetUser, loading } = useApi();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedSheet, setSelectedSheet] = useState(null);
   const [selectedDayIndex, setSelectedDayIndex] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState("all");
-  const [today] = useState(new Date());
 
   useEffect(() => {
-    setLoading(true);
-    fetchTasksForAdmin(userId, selectedDate).finally(() => setLoading(false));
-  }, [
-    userId,
-    selectedDate.getFullYear(),
-    selectedDate.getMonth(),
-    selectedDate.getDate(),
-  ]);
+    fetchTasksForAdmin(userId)
+  }, [userId]);
 
   const isSameDate = (d1, d2) => {
     const a = new Date(d1);

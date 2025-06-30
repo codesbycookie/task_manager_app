@@ -15,6 +15,7 @@ const urls = {
   getTasksForUserUrl: (userId) => `${baseUrl}/tasks/fetch-tasks-for-user/${userId}`,
   getTasksForAdminUrl: (userId) => `${baseUrl}/tasks/admin/tasks-for-user/${userId}`,
   submitTaskUrl: `${baseUrl}/tasks/submit-task`,
+  getTasksForAddUser: (id) => `${baseUrl}/tasks/admin/tasks-to-copy/${id}`,
 
   // Branch URLs
   createBranchUrl: `${baseUrl}/branch/admin/create-branch`,

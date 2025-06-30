@@ -62,7 +62,6 @@ export default function EditTask() {
           {},
           { admin_uid: admin.uid }
         );
-        console.log(response);
         setUsers(response.users);
       } catch (err) {
         console.error(err);

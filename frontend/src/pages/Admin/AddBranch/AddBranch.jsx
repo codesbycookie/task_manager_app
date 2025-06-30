@@ -18,7 +18,6 @@ export default function AddBranch() {
       phone_number: phone,
     };
 
-    console.log('Branch Submitted:', newBranch);
     createBranch(newBranch)
   };
 

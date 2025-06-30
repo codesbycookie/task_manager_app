@@ -1,7 +1,5 @@
-/* eslint-disable no-unused-vars */
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import { useApi } from "../../../context/ApiContext";
-import { getRequest, postRequest } from "../../../utils/ApiService";
 export default function AddTask() {
   const [title, setTitle] = useState("");
   const [frequency, setFrequency] = useState("");
@@ -10,31 +8,8 @@ export default function AddTask() {
   const [dates, setDates] = useState("");
   const [assignedUsers, setAssignedUsers] = useState([]);
 
-  const { assignTask, admin, users } = useApi();
+  const { assignTask, users } = useApi();
 
-  console.log(admin)
-
-
-
-  console.log(users);
-
-  const dummyUsers = [
-    {
-      _id: "682eff61a55efa0aba3c6dce",
-      name: "New User2",
-      email: "newuser2@example.com",
-    },
-    {
-      _id: "682eff61a55efa0aba3c6dcf",
-      name: "Alice Walker",
-      email: "alice@example.com",
-    },
-    {
-      _id: "682eff61a55efa0aba3c6dd0",
-      name: "Bob Johnson",
-      email: "bob@example.com",
-    },
-  ];
 
   const dayOptions = [
   { label: "Sunday", value: "Sunday" },
@@ -79,7 +54,6 @@ const presetGroups = [
       }),
     };
 
-    console.log("New Task:", task);
     assignTask(task);
   };
 

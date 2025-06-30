@@ -40,7 +40,7 @@ export default function Login() {
       };
       login(finalized_formdata);
     } catch (err) {
-      console.log(err);
+      console.err(err.message)
     } finally {
       setFormData({ email: "", password: "" });
     }
@@ -65,7 +65,7 @@ export default function Login() {
             <FaUser size={32} className="user-icon" />
             <h3>User Login</h3>
           </div>
-          
+
           <form onSubmit={handleLogin}>
             <div className="form-group">
               <label htmlFor="email">Email address</label>
@@ -77,20 +77,26 @@ export default function Login() {
                 onChange={handleChange}
                 placeholder="name@example.com"
               />
-              {errors.email && <div className="error-message">{errors.email}</div>}
+              {errors.email && (
+                <div className="error-message">{errors.email}</div>
+              )}
             </div>
 
             <div className="form-group">
               <label htmlFor="password">Password</label>
               <input
                 type="password"
-                className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                className={`form-control ${
+                  errors.password ? "is-invalid" : ""
+                }`}
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
               />
-              {errors.password && <div className="error-message">{errors.password}</div>}
+              {errors.password && (
+                <div className="error-message">{errors.password}</div>
+              )}
             </div>
 
             <button type="submit" className="login-button">
@@ -110,7 +116,7 @@ export default function Login() {
             <FaUserShield size={32} className="admin-icon" />
             <h3>Admin Login</h3>
           </div>
-          
+
           <form onSubmit={handleLogin}>
             <div className="form-group">
               <label htmlFor="email">Admin Email</label>
@@ -122,20 +128,26 @@ export default function Login() {
                 onChange={handleChange}
                 placeholder="admin@example.com"
               />
-              {errors.email && <div className="error-message">{errors.email}</div>}
+              {errors.email && (
+                <div className="error-message">{errors.email}</div>
+              )}
             </div>
 
             <div className="form-group">
               <label htmlFor="password">Admin Password</label>
               <input
                 type="password"
-                className={`form-control ${errors.password ? "is-invalid" : ""}`}
+                className={`form-control ${
+                  errors.password ? "is-invalid" : ""
+                }`}
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
               />
-              {errors.password && <div className="error-message">{errors.password}</div>}
+              {errors.password && (
+                <div className="error-message">{errors.password}</div>
+              )}
             </div>
 
             <button type="submit" className="login-button">

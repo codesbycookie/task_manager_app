@@ -4,14 +4,12 @@ import { useApi } from '../../../context/ApiContext';
 import { Modal, Button } from 'react-bootstrap';
 
 export default function UserSheets() {
-  const { user, fetchTasksForUser, userTasks, submitTask, loading } = useApi();
+  const {fetchTasksForUser, userTasks, submitTask, loading, user } = useApi();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);
 
-  useEffect(() => {
-    if (user?._id) fetchTasksForUser(user?._id);
-  }, []);
+
 
   const handleCheckboxClick = (taskId, statusId) => {
     setSelectedTask(taskId);
@@ -59,7 +57,7 @@ export default function UserSheets() {
         <h3 className="mb-3 mb-md-0 fw-bold" style={{color: '#8dc540'}}>Your Today's Task Sheet</h3>
         <button 
           className="btn btn-primary px-4 py-2 shadow-sm" 
-          onClick={fetchTasksForUser} 
+          onClick={() => fetchTasksForUser(user._id)} 
           disabled={loading}
         >
           {loading ? (

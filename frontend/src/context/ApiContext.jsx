@@ -353,7 +353,6 @@ export function ApiProvider({ children }) {
 
   const fetchTasksForAdmin = async (userId) => {
     setLoading(true);
-    setLoaderMessage("Fetching the tasks");
     try {
       const response = await getRequest(
         getTasksForAdminUrl(userId),

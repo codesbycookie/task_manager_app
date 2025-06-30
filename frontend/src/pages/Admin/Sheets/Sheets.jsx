@@ -5,6 +5,7 @@ import { useApi } from "../../../context/ApiContext";
 import { MdOutlineEdit, MdDelete, MdAdd, MdChevronLeft, MdChevronRight, MdToday } from "react-icons/md";
 import { getFilteredTaskStatuses } from "../../../utils/StatusFilter";
 import "./Sheets.css"; 
+import { IoIosRefresh } from "react-icons/io";
 
 export default function AdminSheets() {
   const { userId } = useParams();
@@ -17,9 +18,13 @@ export default function AdminSheets() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [statusFilter, setStatusFilter] = useState("all");
 
-  useEffect(() => {
-    fetchTasksForAdmin(userId)
-  }, [userId]);
+useEffect(() => {
+  // Only fetch if userId exists and tasks/sheetUser is not already set
+  if (userId && !sheetUser?._id) {
+    fetchTasksForAdmin(userId);
+  }
+}, [userId]);
+
 
   const isSameDate = (d1, d2) => {
     const a = new Date(d1);
@@ -120,8 +125,8 @@ export default function AdminSheets() {
             </span>
           </div>
         </div>
-        
-        <Button 
+        <div className='d-flex gap-3'>
+          <Button 
           variant="primary" 
           size="lg" 
           className="d-flex align-items-center shadow-sm"
@@ -130,6 +135,15 @@ export default function AdminSheets() {
           <MdAdd size={20} className="me-1" />
           Add New Task
         </Button>
+        <a
+        style={{fontSize: '20px'}}
+          className="btn btn-primary d-flex align-items-center shadow-sm px-3"
+          onClick={() => fetchTasksForAdmin(userId)}
+        >
+          <IoIosRefresh size={22} className="me-1" />
+          Refresh
+        </a>
+        </div>
       </div>
 
       {/* Calendar Navigation */}

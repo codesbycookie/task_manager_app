@@ -76,6 +76,7 @@ export default function Login() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="name@example.com"
+                required
               />
               {errors.email && (
                 <div className="error-message">{errors.email}</div>
@@ -93,6 +94,7 @@ export default function Login() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
+                required
               />
               {errors.password && (
                 <div className="error-message">{errors.password}</div>

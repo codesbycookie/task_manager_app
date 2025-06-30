@@ -44,7 +44,7 @@ export default function EditBranch() {
       <form onSubmit={handleSubmit} className="mt-4">
         <div className="mb-3">
           <label className="form-label">Branch Name</label>
-          <input type="text" className="form-control" name="name" value={formData.name} onChange={handleChange} required />
+          <input type="text" className="form-control" name="name"  value={formData.name} onChange={handleChange} required />
         </div>
         <div className="mb-3">
           <label className="form-label">Address</label>
@@ -52,7 +52,7 @@ export default function EditBranch() {
         </div>
         <div className="mb-3">
           <label className="form-label">Phone Number</label>
-          <input type="text" className="form-control" name="phone_number" value={formData.phone_number} onChange={handleChange} required />
+          <input type="text" className="form-control" name="phone_number" maxLength={10} value={formData.phone_number} onChange={handleChange} required />
         </div>
         
         <button type="submit" className="btn btn-primary">Update Branch</button>

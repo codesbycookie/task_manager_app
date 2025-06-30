@@ -79,6 +79,7 @@ const presetGroups = [
           <input
             className="form-check-input"
             type="checkbox"
+            required
             id="select-all-users"
             checked={assignedUsers.length === users.length}
             onChange={(e) => {
@@ -103,6 +104,7 @@ const presetGroups = [
               className="form-check-input"
               type="checkbox"
               id={`user-${user._id}`}
+              required
               checked={assignedUsers.includes(user._id)}
               onChange={() => toggleUser(user._id)}
             />
@@ -175,6 +177,7 @@ const presetGroups = [
     {dayOptions.map((day) => (
       <div className="form-check form-check-inline" key={day.value}>
         <input
+        required
           className="form-check-input"
           type="checkbox"
           id={`day-${day.value}`}

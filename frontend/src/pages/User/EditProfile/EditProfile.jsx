@@ -41,19 +41,19 @@ export default function EditProfile() {
         <h2 className="edit-profile-title">Edit Profile</h2>
 
         <label>Name</label>
-        <input type="text" name="name" value={formData.name} onChange={handleChange} />
+        <input type="text" name="name" required value={formData.name} onChange={handleChange} />
 
         <label>Email</label>
-        <input type="email" name="email" value={formData.email} disabled className="disabled-input" />
+        <input type="email" name="email" required value={formData.email} disabled className="disabled-input" />
 
         <label>Phone Number</label>
-        <input type="text" name="phone_number" value={formData.phone_number} onChange={handleChange} />
+        <input type="text" name="phone_number" required value={formData.phone_number} maxLength={10} onChange={handleChange} />
 
         <label>Address</label>
-        <textarea name="address" value={formData.address} onChange={handleChange}></textarea>
+        <textarea name="address" required value={formData.address} onChange={handleChange}></textarea>
 
         <label>Branch Id</label>
-        <input type="text" name="branch" value={formData.branch} disabled onChange={handleChange} />
+        <input type="text" name="branch" required value={formData.branch} disabled onChange={handleChange} />
 
         <button type="submit">Save Changes</button>
       </form>

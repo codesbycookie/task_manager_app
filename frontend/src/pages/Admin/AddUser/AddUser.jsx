@@ -27,8 +27,8 @@ export default function AddUser() {
 
     if (name === "copyFromUserId") {
       try {
-        const tasks = await fetchTasksForAddUserPage(value)
-        setTaskOptions(tasks || []); 
+        const tasks = await fetchTasksForAddUserPage(value);
+        setTaskOptions(tasks || []);
         setSelectedUserTasks([]);
       } catch (err) {
         console.error("Failed to fetch user tasks", err);
@@ -84,38 +84,42 @@ export default function AddUser() {
         <div className="mb-3">
           <label className="form-label">Copy Tasks From User</label>
           {users.length === 0 && <p>No users available</p>}
-{users.map((user) => (
-  <div key={user._id}>
-    <div className="form-check">
-      <input
-        className="form-check-input"
-        type="radio"
-        name="copyFromUserId"
-        id={`copy-user-${user._id}`}
-        value={user._id}
-        checked={formData.copyFromUserId === user._id}
-        onChange={handleChange}
-      />
-      <label className="form-check-label" htmlFor={`copy-user-${user._id}`}>
-        {user.name} ({user.email})
-      </label>
-    </div>
+          {users.map((user) => (
+            <div key={user._id}>
+              <div className="form-check">
+                <input
+                  className="form-check-input"
+                  type="radio"
+                  required
+                  name="copyFromUserId"
+                  id={`copy-user-${user._id}`}
+                  value={user._id}
+                  checked={formData.copyFromUserId === user._id}
+                  onChange={handleChange}
+                />
+                <label
+                  className="form-check-label"
+                  htmlFor={`copy-user-${user._id}`}
+                >
+                  {user.name} ({user.email})
+                </label>
+              </div>
 
-    {/* ✅ Show 'no tasks' message only for selected user */}
-    {formData.copyFromUserId === user._id && taskOptions.length === 0 && (
-      <div className="alert alert-info ms-3 mt-2">
-        This user has no tasks to copy.{" "}
-        <a
-          href={`/admin/users/sheets/${user._id}`}
-          className="ms-2 btn btn-sm btn-primary"
-        >
-          Add Task to this user
-        </a>
-      </div>
-    )}
-  </div>
-))}
-
+              {/* ✅ Show 'no tasks' message only for selected user */}
+              {formData.copyFromUserId === user._id &&
+                taskOptions.length === 0 && (
+                  <div className="alert alert-info ms-3 mt-2">
+                    This user has no tasks to copy.{" "}
+                    <a
+                      href={`/admin/users/sheets/${user._id}`}
+                      className="ms-2 btn btn-sm btn-primary"
+                    >
+                      Add Task to this user
+                    </a>
+                  </div>
+                )}
+            </div>
+          ))}
         </div>
 
         {/* Task Selection */}
@@ -127,6 +131,7 @@ export default function AddUser() {
                 <input
                   className="form-check-input"
                   type="checkbox"
+                  required
                   id={`task-${task._id}`}
                   checked={selectedUserTasks.includes(task._id)}
                   onChange={() => handleTaskToggle(task._id)}

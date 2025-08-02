@@ -22,7 +22,7 @@ export default function AddBranch() {
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-4 ms-0">
       <h3 className="mb-3">Add New Branch</h3>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">

@@ -5,7 +5,7 @@ export default function AdminProfile() {
   const { admin } = useApi();
 
   return (
-    <div className="container d-flex justify-content-center align-items-center min-vh-90 ">
+    <div className="container d-flex justify-content-center align-items-center min-vh-90 ms-0 ">
   <div className="profile-card card border-0 p-4 w-100" style={{ 
     maxWidth: "500px",
     borderRadius: "15px",

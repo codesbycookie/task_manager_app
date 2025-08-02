@@ -58,7 +58,7 @@ const presetGroups = [
   };
 
   return (
-    <form onSubmit={handleSubmit} className="container mt-4">
+    <form onSubmit={handleSubmit} className="container mt-4 ms-0">
       <h3 className="mb-3">Add New Task</h3>
 
       <div className="mb-3">

@@ -62,7 +62,7 @@ export default function Users() {
   };
 
   return (
-    <div className="container py-4">
+    <div className="container py-4 ms-0">
       {/* Header */}
       <div className="text-center mb-4">
         <h2 className="fw-bold d-flex align-items-center justify-content-center" style={{color: '#8dc540'}}>

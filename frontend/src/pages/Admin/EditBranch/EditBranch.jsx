@@ -39,7 +39,7 @@ export default function EditBranch() {
   if (!branch) return <div className="container mt-5">No branch data provided.</div>;
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5 ms-0">
       <h2>Edit Branch - {branch.name}</h2>
       <form onSubmit={handleSubmit} className="mt-4">
         <div className="mb-3">

@@ -26,7 +26,7 @@ export default function Branches() {
   };
 
   return (
-    <div className="container py-4">
+    <div className="container py-4 ms-0">
       {/* Header Section */}
       <div className="d-flex flex-column flex-md-row align-items-center justify-content-between mb-4">
         <div className="d-flex align-items-center mb-3 mb-md-0">

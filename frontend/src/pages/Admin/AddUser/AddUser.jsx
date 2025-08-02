@@ -77,7 +77,7 @@ export default function AddUser() {
     formData.address.trim() !== "";
 
   return (
-    <div className="container mt-5">
+    <div className="container mt-5 ms-0">
       <h2 className="mb-4">Add New User</h2>
       <form onSubmit={handleSubmit}>
         {/* Copy From User */}

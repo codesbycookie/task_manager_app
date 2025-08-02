@@ -8,65 +8,70 @@ export const getFilteredTaskStatuses = (tasks, selectedDate, statusFilter) => {
   const dayName = selected.toLocaleDateString("en-US", { weekday: "long" });
   const dayNumber = selected.getDate();
 
-  return tasks
-    .filter((sheet) => {
-      const task = sheet.task;
-      const taskDate = task.date ? new Date(task.date) : null;
-      taskDate?.setHours(0, 0, 0, 0);
+  const filteredMap = new Map();
 
-      const matchFrequency =
-        task.frequency === "daily" ||
-        (task.frequency === "weekly" && task.days?.includes(dayName)) ||
-        (task.frequency === "monthly" && task.dates?.includes(dayNumber)) ||
-        (task.frequency === "once" &&
-          taskDate?.getTime() === selected.getTime());
+  for (const sheet of tasks) {
+    const task = sheet.task;
+    const taskDate = task.date ? new Date(task.date) : null;
+    taskDate?.setHours(0, 0, 0, 0);
 
-      return matchFrequency;
-    })
-    .map((sheet) => {
-      const taskStatusDate = sheet.date ? new Date(sheet.date) : null;
-      taskStatusDate?.setHours(0, 0, 0, 0);
+    const matchFrequency =
+      task.frequency === "daily" ||
+      (task.frequency === "weekly" && task.days?.includes(dayName)) ||
+      (task.frequency === "monthly" && task.dates?.includes(dayNumber)) ||
+      (task.frequency === "once" &&
+        taskDate?.getTime() === selected.getTime());
 
-      const isCompletedToday =
-        sheet.status === "completed" &&
-        taskStatusDate &&
-        taskStatusDate.getTime() === selected.getTime();
+    if (!matchFrequency) continue;
 
-      const isMissedToday =
-        sheet.status === "missed" &&
-        taskStatusDate &&
-        taskStatusDate.getTime() === selected.getTime();
+    const taskStatusDate = sheet.date ? new Date(sheet.date) : null;
+    taskStatusDate?.setHours(0, 0, 0, 0);
 
-      let status = "not completed";
-      let dateField = "-";
+    const isCompletedToday =
+      sheet.status === "completed" &&
+      taskStatusDate &&
+      taskStatusDate.getTime() === selected.getTime();
 
-      if (selected < today) {
-        status = isCompletedToday ? "completed" : "missed";
-        dateField = isCompletedToday
-          ? taskStatusDate.toISOString().split("T")[0]
-          : "-";
-      } else if (selected > today) {
-        status = isCompletedToday ? "completed" : "yet to complete";
-        dateField = isCompletedToday
-          ? taskStatusDate.toISOString().split("T")[0]
-          : "-";
+    const isMissedToday =
+      sheet.status === "missed" &&
+      taskStatusDate &&
+      taskStatusDate.getTime() === selected.getTime();
+
+    let status = "not completed";
+    let dateField = "-";
+
+    if (selected < today) {
+      status = isCompletedToday ? "completed" : "missed";
+      dateField = isCompletedToday
+        ? taskStatusDate.toISOString().split("T")[0]
+        : "-";
+    } else if (selected > today) {
+      status = isCompletedToday ? "completed" : "yet to complete";
+      dateField = isCompletedToday
+        ? taskStatusDate.toISOString().split("T")[0]
+        : "-";
+    } else {
+      if (isCompletedToday) {
+        status = "completed";
+        dateField = taskStatusDate.toISOString().split("T")[0];
+      } else if (isMissedToday) {
+        status = "missed";
       } else {
-        // Today
-        if (isCompletedToday) {
-          status = "completed";
-          dateField = taskStatusDate.toISOString().split("T")[0];
-        } else if (isMissedToday) {
-          status = "missed";
-        } else {
-          status = "not completed";
-        }
+        status = "not completed";
       }
+    }
 
-      return {
+    // Ensure uniqueness by task.id
+    if (!filteredMap.has(task.id)) {
+      filteredMap.set(task.id, {
         ...sheet,
         status,
         date: dateField,
-      };
-    })
-    .filter((sheet) => statusFilter === "all" || sheet.status === statusFilter);
+      });
+    }
+  }
+
+  return Array.from(filteredMap.values()).filter(
+    (sheet) => statusFilter === "all" || sheet.status === statusFilter
+  );
 };

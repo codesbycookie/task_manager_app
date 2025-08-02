@@ -1,4 +1,4 @@
-export const getFilteredTaskStatuses = (tasks, selectedDate, statusFilter) => {
+export const getFilteredTaskStatuses = (taskStatuses, tasks, selectedDate, statusFilter) => {
   const selected = new Date(selectedDate);
   selected.setHours(0, 0, 0, 0);
 
@@ -8,70 +8,77 @@ export const getFilteredTaskStatuses = (tasks, selectedDate, statusFilter) => {
   const dayName = selected.toLocaleDateString("en-US", { weekday: "long" });
   const dayNumber = selected.getDate();
 
-  const filteredMap = new Map();
+  // Create a lookup of task info
+  const taskMap = new Map(tasks.map(task => [task._id.$oid, task]));
 
-  for (const sheet of tasks) {
-    const task = sheet.task;
-    const taskDate = task.date ? new Date(task.date) : null;
-    taskDate?.setHours(0, 0, 0, 0);
+  // Filter status entries for selected date and keep only latest per task
+  const latestStatusMap = new Map();
+
+  taskStatuses.forEach((entry) => {
+    const taskId = entry.task.$oid;
+    const taskDate = new Date(entry.date.$date);
+    taskDate.setHours(0, 0, 0, 0);
+
+    if (taskDate.getTime() !== selected.getTime()) return;
+
+    const key = taskId;
+    const current = latestStatusMap.get(key);
+    const updatedAt = new Date(entry.updatedAt?.$date || entry.createdAt?.$date);
+
+    if (!current || new Date(current.updatedAt?.$date || current.createdAt?.$date) < updatedAt) {
+      latestStatusMap.set(key, entry);
+    }
+  });
+
+  // Final list after filtering by frequency, and constructing full status
+  const result = [];
+
+  for (const [taskId, statusEntry] of latestStatusMap.entries()) {
+    const task = taskMap.get(taskId);
+    if (!task) continue;
 
     const matchFrequency =
       task.frequency === "daily" ||
       (task.frequency === "weekly" && task.days?.includes(dayName)) ||
       (task.frequency === "monthly" && task.dates?.includes(dayNumber)) ||
       (task.frequency === "once" &&
-        taskDate?.getTime() === selected.getTime());
+        task.date &&
+        new Date(task.date.$date).setHours(0, 0, 0, 0) === selected.getTime());
 
     if (!matchFrequency) continue;
-
-    const taskStatusDate = sheet.date ? new Date(sheet.date) : null;
-    taskStatusDate?.setHours(0, 0, 0, 0);
-
-    const isCompletedToday =
-      sheet.status === "completed" &&
-      taskStatusDate &&
-      taskStatusDate.getTime() === selected.getTime();
-
-    const isMissedToday =
-      sheet.status === "missed" &&
-      taskStatusDate &&
-      taskStatusDate.getTime() === selected.getTime();
 
     let status = "not completed";
     let dateField = "-";
 
+    const isCompleted = statusEntry.status === "completed";
+    const isMissed = statusEntry.status === "missed";
+
     if (selected < today) {
-      status = isCompletedToday ? "completed" : "missed";
-      dateField = isCompletedToday
-        ? taskStatusDate.toISOString().split("T")[0]
-        : "-";
+      status = isCompleted ? "completed" : "missed";
+      dateField = isCompleted ? new Date(statusEntry.date.$date).toISOString().split("T")[0] : "-";
     } else if (selected > today) {
-      status = isCompletedToday ? "completed" : "yet to complete";
-      dateField = isCompletedToday
-        ? taskStatusDate.toISOString().split("T")[0]
-        : "-";
+      status = isCompleted ? "completed" : "yet to complete";
+      dateField = isCompleted ? new Date(statusEntry.date.$date).toISOString().split("T")[0] : "-";
     } else {
-      if (isCompletedToday) {
+      if (isCompleted) {
         status = "completed";
-        dateField = taskStatusDate.toISOString().split("T")[0];
-      } else if (isMissedToday) {
+        dateField = new Date(statusEntry.date.$date).toISOString().split("T")[0];
+      } else if (isMissed) {
         status = "missed";
       } else {
         status = "not completed";
       }
     }
 
-    // Ensure uniqueness by task.id
-    if (!filteredMap.has(task.id)) {
-      filteredMap.set(task.id, {
-        ...sheet,
+    if (statusFilter === "all" || status === statusFilter) {
+      result.push({
+        ...statusEntry,
+        task,
         status,
         date: dateField,
       });
     }
   }
 
-  return Array.from(filteredMap.values()).filter(
-    (sheet) => statusFilter === "all" || sheet.status === statusFilter
-  );
+  return result;
 };

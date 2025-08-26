@@ -90,7 +90,6 @@ export default function AddUser() {
                 <input
                   className="form-check-input"
                   type="radio"
-                  required
                   name="copyFromUserId"
                   id={`copy-user-${user._id}`}
                   value={user._id}

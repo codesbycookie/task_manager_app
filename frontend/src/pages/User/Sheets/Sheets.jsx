@@ -108,7 +108,7 @@ export default function UserSheets() {
                       key={task._id + index} 
                       className={isCompleted ? 'bg-success bg-opacity-10' : isMissed ? 'bg-danger bg-opacity-10' : ''}
                     >
-                      <td className="fw-semibold">{task._id} {status._id}</td>
+                      <td className="fw-semibold">{index + 1}.</td>
                       <td className={isCompleted ? 'text-decoration-line-through text-muted' : ''}>
                         {task.title}
                       </td>

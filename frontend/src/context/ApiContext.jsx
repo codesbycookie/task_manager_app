@@ -303,9 +303,10 @@ export function ApiProvider({ children }) {
     setLoaderMessage("Assigning the task to the user");
 
     try {
-      const response = postRequest(addTaskUrl, task, { admin_uid: admin.uid });
-      navigate(-1);
-      toast.success(response.message);
+      const response = await postRequest(addTaskUrl, task, { admin_uid: admin.uid });
+      toast.success(response.message || "Task assigned successfully");
+          fetchUserOrAdmin();
+      navigate('/admin/users');
     } catch (err) {
       handleApiError(err);
     } finally {

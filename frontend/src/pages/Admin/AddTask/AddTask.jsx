@@ -40,7 +40,7 @@ const presetGroups = [
     );
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const task = {
@@ -54,7 +54,7 @@ const presetGroups = [
       }),
     };
 
-    assignTask(task);
+    await assignTask(task);
   };
 
   return (
@@ -79,7 +79,6 @@ const presetGroups = [
           <input
             className="form-check-input"
             type="checkbox"
-            required
             id="select-all-users"
             checked={assignedUsers.length === users.length}
             onChange={(e) => {
@@ -104,7 +103,6 @@ const presetGroups = [
               className="form-check-input"
               type="checkbox"
               id={`user-${user._id}`}
-              required
               checked={assignedUsers.includes(user._id)}
               onChange={() => toggleUser(user._id)}
             />

@@ -2,15 +2,23 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Modal, Button, Spinner, Form, Badge } from "react-bootstrap";
 import { useApi } from "../../../context/ApiContext";
-import { MdOutlineEdit, MdDelete, MdAdd, MdChevronLeft, MdChevronRight, MdToday } from "react-icons/md";
+import {
+  MdOutlineEdit,
+  MdDelete,
+  MdAdd,
+  MdChevronLeft,
+  MdChevronRight,
+  MdToday,
+} from "react-icons/md";
 import { getFilteredTaskStatuses } from "../../../utils/StatusFilter";
-import "./Sheets.css"; 
+import "./Sheets.css";
 import { IoIosRefresh } from "react-icons/io";
 
 export default function AdminSheets() {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { deleteTask, fetchTasksForAdmin, tasks, sheetUser, loading } = useApi();
+  const { deleteTask, fetchTasksForAdmin, tasks, sheetUser, loading } =
+    useApi();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedSheet, setSelectedSheet] = useState(null);
@@ -18,13 +26,13 @@ export default function AdminSheets() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [statusFilter, setStatusFilter] = useState("all");
 
-useEffect(() => {
-  // Only fetch if userId exists and tasks/sheetUser is not already set
-  if (userId && !sheetUser?._id) {
-    fetchTasksForAdmin(userId);
-  }
-}, [userId]);
-
+  useEffect(() => {
+    // Only fetch if userId exists and tasks/sheetUser is not already set
+    if (userId && !sheetUser?._id) {
+      // console.log("Fetching tasks for user:", userId, "on date:", selectedDate.toISOString().split('T')[0]);
+      fetchTasksForAdmin(userId, selectedDate.toISOString().split("T")[0]);
+    }
+  }, [userId, selectedDate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isSameDate = (d1, d2) => {
     const a = new Date(d1);
@@ -82,19 +90,34 @@ useEffect(() => {
   };
 
   const filteredTasks = useMemo(() => {
+    // console.log("Filtering tasks for date:", tasks);
     return getFilteredTaskStatuses(tasks, selectedDate, statusFilter);
   }, [tasks, selectedDate, statusFilter]);
+
+  // console.log("Filtered tasks:", filteredTasks);
 
   const daysInMonth = getDaysInMonth(selectedDate);
 
   const getStatusBadge = (status) => {
     switch (status) {
       case "completed":
-        return <Badge bg="success" className="px-3 py-2">✅ Completed</Badge>;
+        return (
+          <Badge bg="success" className="px-3 py-2">
+            ✅ Completed
+          </Badge>
+        );
       case "missed":
-        return <Badge bg="danger" className="px-3 py-2">❌ Missed</Badge>;
+        return (
+          <Badge bg="danger" className="px-3 py-2">
+            ❌ Missed
+          </Badge>
+        );
       default:
-        return <Badge bg="warning" className="px-3 py-2">⚠️ Not Completed</Badge>;
+        return (
+          <Badge bg="warning" className="px-3 py-2">
+            ⚠️ Not Completed
+          </Badge>
+        );
     }
   };
 
@@ -111,11 +134,16 @@ useEffect(() => {
   };
 
   return (
-    <div className="container-fluid py-4 px-lg-5" style={{ maxWidth: '1400px' }}>
+    <div
+      className="container-fluid py-4 px-lg-5"
+      style={{ maxWidth: "1400px" }}
+    >
       {/* Header Section */}
       <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between mb-4">
         <div className="mb-3 mb-md-0">
-          <h2 className="mb-1 text-dark fw-bold">{sheetUser.name}'s Task Dashboard</h2>
+          <h2 className="mb-1 text-dark fw-bold">
+            {sheetUser.name}'s Task Dashboard
+          </h2>
           <div className="d-flex align-items-center">
             <span className="text-muted me-2">Last Login:</span>
             <span className="fw-semibold">
@@ -125,24 +153,24 @@ useEffect(() => {
             </span>
           </div>
         </div>
-        <div className='d-flex gap-3'>
-          <Button 
-          variant="primary" 
-          size="lg" 
-          className="d-flex align-items-center shadow-sm"
-          href="/admin/add-task"
-        >
-          <MdAdd size={20} className="me-1" />
-          Add New Task
-        </Button>
-        <a
-        style={{fontSize: '20px'}}
-          className="btn btn-primary d-flex align-items-center shadow-sm px-3"
-          onClick={() => fetchTasksForAdmin(userId)}
-        >
-          <IoIosRefresh size={22} className="me-1" />
-          Refresh
-        </a>
+        <div className="d-flex gap-3">
+          <Button
+            variant="primary"
+            size="lg"
+            className="d-flex align-items-center shadow-sm"
+            href="/admin/add-task"
+          >
+            <MdAdd size={20} className="me-1" />
+            Add New Task
+          </Button>
+          <a
+            style={{ fontSize: "20px" }}
+            className="btn btn-primary d-flex align-items-center shadow-sm px-3"
+            onClick={() => fetchTasksForAdmin(userId)}
+          >
+            <IoIosRefresh size={22} className="me-1" />
+            Refresh
+          </a>
         </div>
       </div>
 
@@ -150,22 +178,22 @@ useEffect(() => {
       <div className="card shadow-sm mb-4 border-0">
         <div className="card-body p-3">
           <div className="d-flex justify-content-between align-items-center mb-3">
-            <Button 
-              variant="outline-secondary" 
+            <Button
+              variant="outline-secondary"
               onClick={goToPreviousMonth}
               className="rounded-circle p-2"
             >
               <MdChevronLeft size={24} />
             </Button>
-            
+
             <div className="text-center">
               <h3 className="m-0 text-dark fw-bold">
                 {selectedDate.toLocaleString("default", { month: "long" })}{" "}
                 {selectedDate.getFullYear()}
               </h3>
-              <Button 
-                variant="outine-secondary" 
-                size="sm" 
+              <Button
+                variant="outine-secondary"
+                size="sm"
                 className="mt-1"
                 onClick={goToToday}
               >
@@ -173,9 +201,9 @@ useEffect(() => {
                 Today
               </Button>
             </div>
-            
-            <Button 
-              variant="outline-secondary" 
+
+            <Button
+              variant="outline-secondary"
               onClick={goToNextMonth}
               className="rounded-circle p-2"
             >
@@ -185,13 +213,19 @@ useEffect(() => {
 
           {/* Weekday Headers */}
           <div className="row row-cols-7 g-1 mb-2 text-center">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, idx) => (
-              <div key={day} className="col">
-                <div className={`small fw-bold ${selectedDayIndex === idx ? "text-primary" : "text-muted"}`}>
-                  {day}
+            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+              (day, idx) => (
+                <div key={day} className="col">
+                  <div
+                    className={`small fw-bold ${
+                      selectedDayIndex === idx ? "text-primary" : "text-muted"
+                    }`}
+                  >
+                    {day}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
 
           {/* Calendar Days */}
@@ -199,8 +233,10 @@ useEffect(() => {
             {daysInMonth.map((day, i) => {
               const isToday = isSameDate(day, new Date());
               const isSelected = isSameDate(day, selectedDate);
-              const hasTasks = tasks.some(task => isSameDate(new Date(task.date), day));
-              
+              const hasTasks = tasks.some((task) =>
+                isSameDate(new Date(task.date), day)
+              );
+
               return (
                 <div key={i} className="col p-1">
                   <div
@@ -209,23 +245,23 @@ useEffect(() => {
                       ${isToday && !isSelected ? "border border-primary" : ""}
                       ${hasTasks ? "has-tasks" : ""}`}
                     style={{
-                      height: '48px',
-                      position: 'relative',
-                      transition: 'all 0.2s ease'
+                      height: "48px",
+                      position: "relative",
+                      transition: "all 0.2s ease",
                     }}
                     onClick={() => handleDateClick(day)}
                   >
                     <span className={`${isSelected ? "fw-bold" : ""}`}>
                       {day.getDate()}
                     </span>
-                    {hasTasks && (
-                      <div 
+                    {isToday && (
+                      <div
                         className="position-absolute bottom-1"
                         style={{
-                          width: '6px',
-                          height: '6px',
-                          borderRadius: '50%',
-                          backgroundColor: isSelected ? 'white' : '#8dc540'
+                          width: "6px",
+                          height: "6px",
+                          borderRadius: "50%",
+                          backgroundColor: isSelected ? "white" : "#8dc540",
                         }}
                       />
                     )}
@@ -243,19 +279,25 @@ useEffect(() => {
           <div className="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between">
             <div className="mb-3 mb-md-0">
               <h3 className="m-0 text-dark fw-bold">
-                Tasks for {selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                Tasks for{" "}
+                {selectedDate.toLocaleDateString("en-US", {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                })}
               </h3>
               <small className="text-muted">
-                Showing {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
+                Showing {filteredTasks.length}{" "}
+                {filteredTasks.length === 1 ? "task" : "tasks"}
               </small>
             </div>
-            
+
             <div className="d-flex align-items-center">
               <Form.Group className="me-3">
                 <Form.Select
                   size="lg"
                   className="shadow-sm"
-                  style={{ minWidth: '220px' }}
+                  style={{ minWidth: "220px" }}
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
@@ -268,7 +310,7 @@ useEffect(() => {
             </div>
           </div>
         </div>
-        
+
         <div className="card-body p-0">
           {loading ? (
             <div className="text-center py-5">
@@ -276,10 +318,16 @@ useEffect(() => {
               <p className="mt-3 text-muted">Loading tasks...</p>
             </div>
           ) : (
-            <div className="table-responsive" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+            <div
+              className="table-responsive"
+              style={{ maxHeight: "60vh", overflowY: "auto" }}
+            >
               <table className="table table-hover align-middle mb-0">
                 <thead className="bg-light sticky-top">
                   <tr>
+                    {/* <th className="">Id</th> */}
+                    <th className="">No.</th>
+
                     <th className="ps-4">Task Title</th>
                     <th>Frequency</th>
                     <th>Schedule</th>
@@ -290,15 +338,23 @@ useEffect(() => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredTasks.map((sheet) => (
-                    <tr 
-                      key={sheet._id} 
+                  {filteredTasks.map((sheet, idx) => (
+                    <tr
+                      key={sheet._id}
                       className={
-                        sheet.status === "completed" ? "bg-success bg-opacity-10" : 
-                        sheet.status === "missed" ? "bg-danger bg-opacity-10" : ""
+                        sheet.status === "completed"
+                          ? "bg-success bg-opacity-10"
+                          : sheet.status === "missed"
+                          ? "bg-danger bg-opacity-10"
+                          : ""
                       }
-                      style={{ height: '60px' }} // Fixed row height
+                      style={{ height: "60px" }} // Fixed row height
                     >
+                      {/* <td>{sheet.task._id} {sheet._id}</td> */}
+                      <td>
+                        <b>{idx + 1}.</b>
+                      </td>
+
                       <td className="ps-4 fw-semibold">{sheet.task.title}</td>
                       <td>
                         <Badge bg="secondary" className="text-capitalize">
@@ -318,9 +374,7 @@ useEffect(() => {
                           return "-";
                         })()}
                       </td>
-                      <td>
-                        {getStatusBadge(sheet.status)}
-                      </td>
+                      <td>{getStatusBadge(sheet.status)}</td>
                       <td>
                         <small className="text-muted">
                           {formatDateTime(sheet.task.createdAt)}
@@ -341,7 +395,7 @@ useEffect(() => {
                           size="sm"
                           onClick={() => handleEdit(sheet.task)}
                           className="me-2 rounded-circle"
-                          style={{ width: '32px', height: '32px' }}
+                          style={{ width: "32px", height: "32px" }}
                           id="table-button"
                         >
                           <MdOutlineEdit size={16} />
@@ -351,7 +405,7 @@ useEffect(() => {
                           size="sm"
                           onClick={() => handleDeleteClick(sheet)}
                           className="rounded-circle"
-                          style={{ width: '32px', height: '32px' }}
+                          style={{ width: "32px", height: "32px" }}
                           id="table-button"
                         >
                           <MdDelete size={16} />
@@ -360,18 +414,20 @@ useEffect(() => {
                     </tr>
                   ))}
                   {filteredTasks.length === 0 && (
-                    <tr style={{ height: '200px' }}>
+                    <tr style={{ height: "200px" }}>
                       <td colSpan="7" className="text-center py-5">
                         <div className="d-flex flex-column align-items-center justify-content-center">
-                          <img 
-                            src="https://cdn-icons-png.flaticon.com/512/4076/4076478.png" 
-                            alt="No tasks" 
-                            style={{ width: '120px', opacity: 0.7 }}
+                          <img
+                            src="https://cdn-icons-png.flaticon.com/512/4076/4076478.png"
+                            alt="No tasks"
+                            style={{ width: "120px", opacity: 0.7 }}
                             className="mb-3"
                           />
-                          <h5 className="text-muted mb-3">No tasks for this day</h5>
-                          <Button 
-                            variant="primary" 
+                          <h5 className="text-muted mb-3">
+                            No tasks for this day
+                          </h5>
+                          <Button
+                            variant="primary"
                             href="/admin/add-task"
                             className="d-flex align-items-center"
                           >
@@ -403,23 +459,20 @@ useEffect(() => {
               Delete "{selectedSheet?.task?.title}"?
             </h5>
             <p className="text-muted">
-              This action cannot be undone. All data related to this task will be permanently removed.
+              This action cannot be undone. All data related to this task will
+              be permanently removed.
             </p>
           </div>
         </Modal.Body>
         <Modal.Footer className="border-0 pt-0">
-          <Button 
-            variant="outline-secondary" 
+          <Button
+            variant="outline-secondary"
             onClick={() => setShowModal(false)}
             className="px-4"
           >
             Cancel
           </Button>
-          <Button 
-            variant="danger" 
-            onClick={confirmDelete}
-            className="px-4"
-          >
+          <Button variant="danger" onClick={confirmDelete} className="px-4">
             Delete Task
           </Button>
         </Modal.Footer>

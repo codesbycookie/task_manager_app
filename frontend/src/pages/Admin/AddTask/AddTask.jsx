@@ -177,7 +177,6 @@ const presetGroups = [
     {dayOptions.map((day) => (
       <div className="form-check form-check-inline" key={day.value}>
         <input
-        required
           className="form-check-input"
           type="checkbox"
           id={`day-${day.value}`}

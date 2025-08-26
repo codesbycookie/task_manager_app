@@ -12,7 +12,7 @@ const urls = {
   addTaskUrl: `${baseUrl}/tasks/admin/add-task`,
   editTaskUrl: (taskId) => `${baseUrl}/tasks/admin/edit-task/${taskId}`,
   deleteTaskStatusUrl: (taskStatusId) => `${baseUrl}/tasks/admin/delete-task/${taskStatusId}`,
-  getTasksForUserUrl: (userId) => `${baseUrl}/tasks/fetch-tasks-for-user/${userId}`,
+  getTasksForUserUrl: (userId, today) => `${baseUrl}/tasks/fetch-tasks-for-user/${userId}?date=${today}`,
   getTasksForAdminUrl: (userId) => `${baseUrl}/tasks/admin/tasks-for-user/${userId}`,
   submitTaskUrl: `${baseUrl}/tasks/submit-task`,
   getTasksForAddUser: (id) => `${baseUrl}/tasks/admin/tasks-to-copy/${id}`,

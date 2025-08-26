@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useApi } from '../../../context/ApiContext';
 import { Modal, Button } from 'react-bootstrap';
@@ -10,7 +10,7 @@ export default function UserSheets() {
   const [selectedStatus, setSelectedStatus] = useState(null);
 
 
-  
+  // console.log("UserTasks:", userTasks);
 
 
 
@@ -90,7 +90,7 @@ export default function UserSheets() {
             <table className="table table-hover align-middle mb-0">
               <thead className="table-light sticky-top">
                 <tr>
-                  <th style={{ width: '5%', minWidth: '50px' }} className="bg-light">#</th>
+                  <th style={{ width: '5%', minWidth: '50px' }} className="bg-light">S No.</th>
                   <th style={{ width: '25%', minWidth: '200px' }} className="bg-light">Task</th>
                   <th style={{ width: '25%', minWidth: '200px' }} className="bg-light">Created At</th>
                   <th style={{ width: '25%', minWidth: '200px' }} className="bg-light">Submitted At</th>
@@ -105,10 +105,10 @@ export default function UserSheets() {
 
                   return (
                     <tr 
-                      key={task._id} 
+                      key={task._id + index} 
                       className={isCompleted ? 'bg-success bg-opacity-10' : isMissed ? 'bg-danger bg-opacity-10' : ''}
                     >
-                      <td className="fw-semibold">{index + 1}</td>
+                      <td className="fw-semibold">{task._id} {status._id}</td>
                       <td className={isCompleted ? 'text-decoration-line-through text-muted' : ''}>
                         {task.title}
                       </td>

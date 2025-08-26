@@ -326,7 +326,7 @@ const submitTask = async (req, res) => {
     const newStatus = new TaskStatus({
       user: userId,
       task: taskId,
-      date: assignedDate,
+      date: today,
       completedAt: new Date(),
       status: 'completed',
     });

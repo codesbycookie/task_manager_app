@@ -351,11 +351,11 @@ export function ApiProvider({ children }) {
     }
   };
 
-  const fetchTasksForAdmin = async (userId) => {
+  const fetchTasksForAdmin = async (userId, today) => {
     setLoading(true);
     try {
       const response = await getRequest(
-        getTasksForAdminUrl(userId),
+        getTasksForAdminUrl(userId, today),
         {},
         { admin_uid: admin.uid }
       );

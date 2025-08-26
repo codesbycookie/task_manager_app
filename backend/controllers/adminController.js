@@ -10,7 +10,7 @@ const adminLogin = async(req, res) => {
         const {uid} = req.body;
         const admin = await Admin.findOne({uid: uid});
         if(!admin){
-            return res.status(404).json({ message: 'Admin not found.' });
+            return res.status(404).json({ message: 'Admin not found.', uid: uid, admin: admin });
         }
         const users = await User.find({}).populate('branch');
         const tasks = await TaskStatus.find({})

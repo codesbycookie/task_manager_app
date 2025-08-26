@@ -26,7 +26,6 @@ app.use(cors({ origin: '*' }))
 
 const dbUrl = process.env.DB_URL || 'mongodb://localhost:27017/TaskManager';
 //
-//mongodb+srv://akileshsampath1404:akileshdb123456@sap-checklist-database.jfltzs9.mongodb.net/sap-checklist-app?retryWrites=true&w=majority&appName=Cluster0
 mongoose.connect(dbUrl);
 
 const db = mongoose.connection;

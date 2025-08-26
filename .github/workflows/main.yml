@@ -10,9 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render Deploy (Frontend)
-        run: curl "${{ secrets.RENDER_DEPLOY_HOOK_FRONTEND }}"
+        run: curl "https://api.render.com/deploy/srv-d1gof8idbo4c73b256i0?key=EazVkibpxxM"
 
       - name: Trigger Render Deploy (Backend)
-        run: curl "${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}"
+        run: curl "https://api.render.com/deploy/srv-d1go0onfte5s738thm6g?key=yTDsLdanmKI" 
 
-        

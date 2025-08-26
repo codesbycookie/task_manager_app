@@ -112,6 +112,12 @@ export default function AdminSheets() {
             ❌ Missed
           </Badge>
         );
+      case "yet to complete":
+        return (
+          <Badge bg="warning" className="px-3 py-2">
+            ⏳ Yet to Complete
+          </Badge>
+        );
       default:
         return (
           <Badge bg="warning" className="px-3 py-2">

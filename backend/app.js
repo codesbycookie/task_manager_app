@@ -18,13 +18,15 @@ const adminRoutes = require('./routes/adminRoutes');
 const refreshMissedStatusesForUser = require('./utils/refreshMissedTasks');
 
 const app = express();
+//# DB_URL=mongodb+srv://akileshsampath1404:akileshdb123456@sap-checklist-database.jfltzs9.mongodb.net/sap-checklist-app?retryWrites=true&w=majority&appName=Cluster0
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const allowedOrigins = [
   "https://task-manager-app-kywo.onrender.com",
-  "https://www.tasklist.co.in"
+  "https://www.tasklist.co.in",
+  "https://checklist-tailwind.onrender.com"
 ];
 
 app.use(cors({
@@ -79,6 +81,6 @@ app.use('/api/admin', adminRoutes);
 // });
 
 
-app.listen(process.env.PORT || 3000, () => {
+app.listen(3000, () => {
   console.log(`Listening to the port ${process.env.PORT || 3000}`);
 })

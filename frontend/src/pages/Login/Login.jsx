@@ -40,7 +40,7 @@ export default function Login() {
       };
       login(finalized_formdata);
     } catch (err) {
-      console.err(err.message)
+      console.err(err.message);
     } finally {
       setFormData({ email: "", password: "" });
     }

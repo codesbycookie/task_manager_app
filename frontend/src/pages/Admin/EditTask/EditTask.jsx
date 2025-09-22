@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useApi } from "../../../context/ApiContext";
 import { useNavigate, useLocation } from "react-router-dom";
-import {getRequest} from '../../../utils/ApiService'
 import './EditTask.css'
 
 
 export default function EditTask() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { editTask, admin } = useApi();
+  const { editTask,  users } = useApi();
 
   // Get task from location state
   const task = location.state?.task;
@@ -19,7 +18,6 @@ export default function EditTask() {
   const [days, setDays] = useState([]);
   const [dates, setDates] = useState("");
   const [assignedUsers, setAssignedUsers] = useState([]);
-  const [users, setUsers] = useState([]);
 
   const dayOptions = [
     "Sunday",
@@ -32,7 +30,6 @@ export default function EditTask() {
   ];
 
   useEffect(() => {
-    // If no task in location.state, redirect back or handle error
     if (!task) {
       alert("No task data found");
       navigate("/admin/tasks");
@@ -53,23 +50,7 @@ export default function EditTask() {
     }
   }, [task, navigate]);
 
-  // Fetch users for assigning
-   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await getRequest(
-          "http://localhost:3000/api/user/get-all-users",
-          {},
-          { admin_uid: admin.uid }
-        );
-        setUsers(response.users);
-      } catch (err) {
-        console.error(err);
-      }
-    };
 
-    fetchUsers();
-  }, []);
 
   const toggleDay = (day) => {
     setDays((prev) =>
@@ -131,7 +112,6 @@ export default function EditTask() {
             className="form-check-input"
             type="checkbox"
             id="select-all-users"
-            required
             checked={assignedUsers.length === users.length && users.length > 0}
             onChange={(e) => {
               if (e.target.checked) {

@@ -85,7 +85,6 @@ export default function EditTask() {
       await editTask(updatedTask,user);
     } catch (error) {
       console.error(error);
-      alert("Failed to update task");
     }
   };
 
@@ -135,7 +134,6 @@ export default function EditTask() {
               className="form-check-input"
               type="checkbox"
               id={`user-${user._id}`}
-              required
               checked={assignedUsers.includes(user._id)}
               onChange={() => toggleUser(user._id)}
             />
@@ -185,7 +183,6 @@ export default function EditTask() {
                 className="form-check-input"
                 type="checkbox"
                 id={`day-${day}`}
-                required
                 checked={days.includes(day)}
                 onChange={() => toggleDay(day)}
               />

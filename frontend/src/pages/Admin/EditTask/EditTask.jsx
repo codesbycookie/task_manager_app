@@ -7,7 +7,7 @@ import './EditTask.css'
 export default function EditTask() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { editTask,  users } = useApi();
+  const { editTask,  users, fetchTasksForAdmin } = useApi();
 
   // Get task from location state
   const task = location.state?.task;
@@ -83,6 +83,7 @@ export default function EditTask() {
 
     try {
       await editTask(updatedTask,user);
+      fetchTasksForAdmin();
     } catch (error) {
       console.error(error);
     }

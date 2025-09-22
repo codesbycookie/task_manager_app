@@ -315,7 +315,7 @@ export function ApiProvider({ children }) {
     }
   };
 
-  const editTask = async (task, user) => {
+  const editTask = async (task) => {
     setLoading(true);
     setLoaderMessage("Updating the task to the database");
     try {
@@ -323,7 +323,7 @@ export function ApiProvider({ children }) {
         admin_uid: admin.uid,
       });
       toast.success(res.message);
-      fetchTasksForAdmin(user._id);
+      fetchTasksForAdmin();
       navigate(-1);
     } catch (err) {
       handleApiError(err);

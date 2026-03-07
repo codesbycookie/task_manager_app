@@ -26,7 +26,8 @@ app.use(express.urlencoded({ extended: true }));
 const allowedOrigins = [
   "https://task-manager-app-kywo.onrender.com",
   "https://www.tasklist.co.in",
-  "https://checklist-tailwind.onrender.com"
+  "https://checklist-tailwind.onrender.com",
+  "http://localhost:5173"
 ];
 
 app.use(cors({

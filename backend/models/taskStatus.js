@@ -19,6 +19,10 @@ const taskStatus_schema = new mongoose.Schema({
         enum: ['completed', 'not completed', 'missed'],
         default: 'not completed'
     },
+    priority: {
+        type: Number,
+        default: 0
+    },
     completedAt: {
         type: Date
     }

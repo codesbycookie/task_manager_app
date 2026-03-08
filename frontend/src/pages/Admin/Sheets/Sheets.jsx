@@ -13,18 +13,105 @@ import {
 import { getFilteredTaskStatuses } from "../../../utils/StatusFilter";
 import "./Sheets.css";
 import { IoIosRefresh } from "react-icons/io";
+import {
+  DndContext,
+  closestCenter,
+} from "@dnd-kit/core";
+
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+
+import { CSS } from "@dnd-kit/utilities";
+
+
+
+function SortableRow({ sheet, idx, handleEdit, handleDeleteClick, getStatusBadge, formatDateTime }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+  } = useSortable({ id: sheet._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <tr ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <td><b>{idx + 1}.</b></td>
+
+      <td className="ps-4 fw-semibold">{sheet.task.title}</td>
+
+      <td>
+        <Badge bg="secondary" className="text-capitalize">
+          {sheet.task.frequency}
+        </Badge>
+      </td>
+
+      <td>{sheet.task.frequency}</td>
+
+      <td>{getStatusBadge(sheet.status)}</td>
+
+      <td>
+        <small className="text-muted">
+          {formatDateTime(sheet.task.createdAt)}
+        </small>
+      </td>
+
+      <td>
+        {sheet.status === "completed" ? (
+          <small className="text-muted">
+            {formatDateTime(sheet.completedAt)}
+          </small>
+        ) : (
+          "-"
+        )}
+      </td>
+
+      <td className="pe-4 text-end">
+        <Button
+          variant="outline-secondary"
+          size="sm"
+          onClick={() => handleEdit(sheet.task)}
+          className="me-2 rounded-circle"
+        >
+          <MdOutlineEdit size={16} />
+        </Button>
+
+        <Button
+          variant="outline-danger"
+          size="sm"
+          onClick={() => handleDeleteClick(sheet)}
+          className="rounded-circle"
+        >
+          <MdDelete size={16} />
+        </Button>
+      </td>
+    </tr>
+  );
+}
 
 export default function AdminSheets() {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { deleteTask, fetchTasksForAdmin, tasks, sheetUser, loading } =
+  const { deleteTask, fetchTasksForAdmin, tasks, sheetUser, loading, reorderTasks } =
     useApi();
 
   const [showModal, setShowModal] = useState(false);
+  const [taskList, setTaskList] = useState([]);
   const [selectedSheet, setSelectedSheet] = useState(null);
   const [selectedDayIndex, setSelectedDayIndex] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [statusFilter, setStatusFilter] = useState("all");
+
+
 
   useEffect(() => {
     // Only fetch if userId exists and tasks/sheetUser is not already set
@@ -95,6 +182,29 @@ export default function AdminSheets() {
   }, [tasks, selectedDate, statusFilter]);
 
   // console.log("Filtered tasks:", filteredTasks);
+
+
+
+  useEffect(() => {
+    setTaskList(filteredTasks);
+  }, [filteredTasks]);
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = taskList.findIndex(t => t._id === active.id);
+    const newIndex = taskList.findIndex(t => t._id === over.id);
+
+    const newList = arrayMove(taskList, oldIndex, newIndex);
+
+    setTaskList(newList);
+
+    const orderedIds = newList.map(task => task._id);
+
+    await reorderTasks(userId, orderedIds);
+  };
 
   const daysInMonth = getDaysInMonth(selectedDate);
 
@@ -223,9 +333,8 @@ export default function AdminSheets() {
               (day, idx) => (
                 <div key={day} className="col">
                   <div
-                    className={`small fw-bold ${
-                      selectedDayIndex === idx ? "text-primary" : "text-muted"
-                    }`}
+                    className={`small fw-bold ${selectedDayIndex === idx ? "text-primary" : "text-muted"
+                      }`}
                   >
                     {day}
                   </div>
@@ -343,108 +452,26 @@ export default function AdminSheets() {
                     <th className="pe-4 text-end">Actions</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {filteredTasks.map((sheet, idx) => (
-                    <tr
-                      key={sheet._id}
-                      className={
-                        sheet.status === "completed"
-                          ? "bg-success bg-opacity-10"
-                          : sheet.status === "missed"
-                          ? "bg-danger bg-opacity-10"
-                          : ""
-                      }
-                      style={{ height: "60px" }} // Fixed row height
-                    >
-                      {/* <td>{sheet.task._id} {sheet._id}</td> */}
-                      <td>
-                        <b>{idx + 1}.</b>
-                      </td>
-
-                      <td className="ps-4 fw-semibold">{sheet.task.title}</td>
-                      <td>
-                        <Badge bg="secondary" className="text-capitalize">
-                          {sheet.task.frequency}
-                        </Badge>
-                      </td>
-                      <td>
-                        {(() => {
-                          const { frequency, days, dates, date } = sheet.task;
-                          if (frequency === "daily") return "Every day";
-                          if (frequency === "weekly" && days?.length > 0)
-                            return days.join(", ");
-                          if (frequency === "monthly" && dates?.length > 0)
-                            return dates.join(", ");
-                          if (frequency === "once" && date)
-                            return new Date(date).toLocaleDateString();
-                          return "-";
-                        })()}
-                      </td>
-                      <td>{getStatusBadge(sheet.status)}</td>
-                      <td>
-                        <small className="text-muted">
-                          {formatDateTime(sheet.task.createdAt)}
-                        </small>
-                      </td>
-                      <td>
-                        {sheet.status === "completed" && sheet.date !== "-" ? (
-                          <small className="text-muted">
-                            {formatDateTime(sheet.completedAt)}
-                          </small>
-                        ) : (
-                          <span className="text-muted">-</span>
-                        )}
-                      </td>
-                      <td className="pe-4 text-end" id="table-actions">
-                        <Button
-                          variant="outline-secondary"
-                          size="sm"
-                          onClick={() => handleEdit(sheet.task)}
-                          className="me-2 rounded-circle"
-                          style={{ width: "32px", height: "32px" }}
-                          id="table-button"
-                        >
-                          <MdOutlineEdit size={16} />
-                        </Button>
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          onClick={() => handleDeleteClick(sheet)}
-                          className="rounded-circle"
-                          style={{ width: "32px", height: "32px" }}
-                          id="table-button"
-                        >
-                          <MdDelete size={16} />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                  {filteredTasks.length === 0 && (
-                    <tr style={{ height: "200px" }}>
-                      <td colSpan="7" className="text-center py-5">
-                        <div className="d-flex flex-column align-items-center justify-content-center">
-                          <img
-                            src="https://cdn-icons-png.flaticon.com/512/4076/4076478.png"
-                            alt="No tasks"
-                            style={{ width: "120px", opacity: 0.7 }}
-                            className="mb-3"
-                          />
-                          <h5 className="text-muted mb-3">
-                            No tasks for this day
-                          </h5>
-                          <Button
-                            variant="primary"
-                            href="/admin/add-task"
-                            className="d-flex align-items-center"
-                          >
-                            <MdAdd className="me-1" />
-                            Create Task
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
+                <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                  <SortableContext
+                    items={taskList.map(t => t._id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <tbody>
+                      {taskList.map((sheet, idx) => (
+                        <SortableRow
+                          key={sheet._id}
+                          sheet={sheet}
+                          idx={idx}
+                          handleEdit={handleEdit}
+                          handleDeleteClick={handleDeleteClick}
+                          getStatusBadge={getStatusBadge}
+                          formatDateTime={formatDateTime}
+                        />
+                      ))}
+                    </tbody>
+                  </SortableContext>
+                </DndContext>
               </table>
             </div>
           )}

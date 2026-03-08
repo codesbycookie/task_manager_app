@@ -62,12 +62,25 @@ const addTask = async (req, res) => {
       return d;
     }
 
-    const taskStatusEntries = users_assigned.map(userId => ({
-      user: userId,
-      task: task._id,
-      date: new Date(),
-      status: 'not completed',
-    }));
+    const taskStatusEntries = [];
+
+    for (const userId of users_assigned) {
+
+      const lastTask = await TaskStatus
+        .findOne({ user: userId })
+        .sort({ priority: -1 });
+
+      const nextPriority = lastTask ? lastTask.priority + 1 : 1;
+
+      taskStatusEntries.push({
+        user: userId,
+        task: task._id,
+        date: new Date(),
+        status: 'not completed',
+        priority: nextPriority
+      });
+
+    }
 
     await TaskStatus.insertMany(taskStatusEntries);
 
@@ -133,6 +146,15 @@ const deleteTask = async (req, res) => {
 
     const deletedTaskStatus = await TaskStatus.findByIdAndDelete(taskStatusId).populate('task');
 
+    const remainingTasks = await TaskStatus
+      .find({ user: deletedTaskStatus.user })
+      .sort({ priority: 1 });
+
+    for (let i = 0; i < remainingTasks.length; i++) {
+      remainingTasks[i].priority = i + 1;
+      await remainingTasks[i].save();
+    }
+
 
     const task = await Task.findById(deletedTaskStatus.task._id);
 
@@ -160,7 +182,27 @@ const deleteTask = async (req, res) => {
   }
 };
 
+const reorderTasks = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { tasks } = req.body;
 
+    const bulkOps = tasks.map((taskId, index) => ({
+      updateOne: {
+        filter: { _id: taskId, user: userId },
+        update: { priority: index + 1 }
+      }
+    }));
+
+    await TaskStatus.bulkWrite(bulkOps);
+
+    res.json({ message: "Priority updated successfully" });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
 
 const getTaskByUserId = async (req, res) => {
   try {
@@ -171,7 +213,12 @@ const getTaskByUserId = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const statuses = await TaskStatus.find({ user: userId }).populate('task').populate('user');
+    const statuses = await TaskStatus
+      .find({ user: userId })
+      .populate('task')
+      .populate('user')
+      .sort({ priority: 1, createdAt: 1 });
+
 
     res.status(200).json({ tasks: statuses, user: user });
 
@@ -183,8 +230,11 @@ const getTaskByUserId = async (req, res) => {
 
 const fetchTaskStatusForUser = async (req, res) => {
   try {
+
     const { userId } = req.params;
-    if (!userId) return res.status(400).json({ message: "User ID is required" });
+    if (!userId) {
+      return res.status(400).json({ message: "User ID is required" });
+    }
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -192,30 +242,34 @@ const fetchTaskStatusForUser = async (req, res) => {
     const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
     const dayNumber = today.getDate();
 
-    // Define start and end of today
     const startOfDay = new Date(today);
     const endOfDay = new Date(today);
     endOfDay.setHours(23, 59, 59, 999);
 
-    // Fetch today's statuses for user
-    const taskStatuses = await TaskStatus.find({
-      user: userId,
-      date: { $gte: startOfDay, $lte: endOfDay },
-    }).populate("task").populate('user');
+    // Get existing statuses sorted by priority
+    const taskStatuses = await TaskStatus
+      .find({
+        user: userId,
+        date: { $gte: startOfDay, $lte: endOfDay }
+      })
+      .populate("task")
+      .populate("user")
+      .sort({ priority: 1 });
 
-    // Map for fast lookup
     const statusMap = new Map();
+
     for (const s of taskStatuses) {
       statusMap.set(s.task._id.toString(), s);
     }
 
-    // Fetch all tasks assigned to the user
     const allTasks = await Task.find({ users_assigned: userId });
 
-    const filteredTasks = [];
+    const tasksToCreate = [];
 
     for (const task of allTasks) {
+
       const frequency = task.frequency;
+
       const taskDate = task.date ? new Date(task.date) : null;
       taskDate?.setHours(0, 0, 0, 0);
 
@@ -223,35 +277,50 @@ const fetchTaskStatusForUser = async (req, res) => {
         frequency === "daily" ||
         (frequency === "weekly" && task.days?.includes(dayName)) ||
         (frequency === "monthly" && task.dates?.includes(dayNumber)) ||
-        (frequency === "once" && taskDate?.toLocaleDateString() === today.toLocaleDateString());
+        (frequency === "once" && taskDate?.toDateString() === today.toDateString());
 
       if (!isDueToday) continue;
 
-      let status = statusMap.get(task._id.toString());
-
-      // If not already created, create TaskStatus with 'not completed'
-      if (!status) {
-        status = await TaskStatus.create({
+      if (!statusMap.has(task._id.toString())) {
+        tasksToCreate.push({
           user: userId,
           task: task._id,
           date: today,
-          status: "not completed",
+          status: "not completed"
         });
       }
-
-      filteredTasks.push({
-        task,
-        status: status,
-        completedAt: status.completedAt || null,
-        date: today,
-      });
     }
 
-    res.status(200).json({ tasks: filteredTasks });
+    if (tasksToCreate.length > 0) {
+      const created = await TaskStatus.insertMany(tasksToCreate);
+
+      for (const s of created) {
+        const populated = await s.populate("task user");
+        taskStatuses.push(populated);
+      }
+    }
+
+    // Final priority sort
+    taskStatuses.sort((a, b) => (a.priority || 0) - (b.priority || 0));
+
+    const result = taskStatuses.map(s => ({
+      task: s.task,
+      status: s,
+      completedAt: s.completedAt || null,
+      date: s.date
+    }));
+
+    res.status(200).json({ tasks: result });
 
   } catch (err) {
+
     console.error(err);
-    res.status(500).json({ message: "Server Error", error: err.message });
+
+    res.status(500).json({
+      message: "Server Error",
+      error: err.message
+    });
+
   }
 };
 
@@ -372,5 +441,6 @@ module.exports = {
   getTaskByUserId,
   submitTask,
   fetchTaskStatusForUser,
-  fetchTasksToCopyForUser
+  fetchTasksToCopyForUser,
+  reorderTasks
 };

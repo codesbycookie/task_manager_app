@@ -1,0 +1,6 @@
+tailwind_version/node_modules/
+ts_version/node_modules
+tailwind_version/dist/
+ts_version/dist/
+tailwind_version/.env
+ts_version/.env

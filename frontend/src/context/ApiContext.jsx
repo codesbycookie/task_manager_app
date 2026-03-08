@@ -31,6 +31,7 @@ const {
   deleteBranchUrl,
   loginAdminUrl,
   getTasksForAddUser,
+  reorderTaskPriorityUrl,
 } = urls;
 
 const ApiContext = createContext();
@@ -125,6 +126,21 @@ export function ApiProvider({ children }) {
     } finally {
       setLoading(false);
       setLoaderMessage("");
+    }
+  };
+
+  const reorderTasks = async (userId, orderedTaskIds) => {
+    try {
+
+      await postRequest(
+        reorderTaskPriorityUrl(userId),
+        { tasks: orderedTaskIds },
+        { admin_uid: admin.uid }
+      );
+      toast.success('Tasks reordered successfully');
+
+    } catch (err) {
+      handleApiError(err);
     }
   };
 
@@ -305,7 +321,7 @@ export function ApiProvider({ children }) {
     try {
       const response = await postRequest(addTaskUrl, task, { admin_uid: admin.uid });
       toast.success(response.message || "Task assigned successfully");
-          fetchUserOrAdmin();
+      fetchUserOrAdmin();
       navigate('/admin/users');
     } catch (err) {
       handleApiError(err);
@@ -505,6 +521,8 @@ export function ApiProvider({ children }) {
     editUser,
     fetchTasksForAddUserPage,
     loaderMessage,
+    reorderTasks
+
   };
   return <ApiContext.Provider value={value}>{children}</ApiContext.Provider>;
 }

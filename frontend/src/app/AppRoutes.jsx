@@ -23,7 +23,7 @@ import ProtectedRoute from "./ProtectedRoute";
 
 import NotFound from "../pages/Components/NotFound";
 import Loader from "../pages/Components/Loader";
-import { LoadingProvider } from "../context/loadingContext";
+import { LoadingProvider } from "../context/LoadingContext";
 
 function AppRoutesWithApi() {
   const { loading } = useApi();

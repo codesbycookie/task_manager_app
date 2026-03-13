@@ -21,7 +21,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useLoading } from "../../../context/loadingContext";
+import { useLoading } from "../../../context/LoadingContext";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 

@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useApi } from '../../../context/ApiContext';
 import { Modal, Button } from 'react-bootstrap';
+import { useLoading } from '../../../context/loadingContext';
 
 export default function UserSheets() {
-  const {fetchTasksForUser, userTasks, submitTask, loading, user } = useApi();
+  const {fetchTasksForUser, userTasks, submitTask, user } = useApi();
+  const {loading} = useLoading();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [selectedStatus, setSelectedStatus] = useState(null);

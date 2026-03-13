@@ -23,6 +23,7 @@ import ProtectedRoute from "./ProtectedRoute";
 
 import NotFound from "../pages/Components/NotFound";
 import Loader from "../pages/Components/Loader";
+import { LoadingProvider } from "../context/loadingContext";
 
 function AppRoutesWithApi() {
   const { loading } = useApi();
@@ -78,9 +79,10 @@ function AppRoutesWithApi() {
 export default function AppRoutes() {
   return (
     <AuthProvider>
-      <ApiProvider>
-        <AppRoutesWithApi />
-      </ApiProvider>
+      <LoadingProvider>
+        <ApiProvider>
+          <AppRoutesWithApi />
+        </ApiProvider></LoadingProvider>
     </AuthProvider>
   );
 }

@@ -1,7 +1,7 @@
 export const getFilteredTaskStatuses = (tasks, selectedDate, statusFilter) => {
   // console.log("filtering ");
 
-  const selected = new Date(selectedDate);
+const selected = new Date(selectedDate + "T00:00:00"); // forces local time
   selected.setHours(0, 0, 0, 0);
 
   const today = new Date();

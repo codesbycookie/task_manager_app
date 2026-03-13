@@ -81,7 +81,6 @@ textarea:focus {
 /* Radio labels */
 .form-check-label {
   cursor: pointer;
-  user-select: none;
   font-weight: 500;
   color: #444;
 }

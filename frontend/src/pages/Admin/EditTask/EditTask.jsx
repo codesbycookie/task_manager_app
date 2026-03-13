@@ -7,11 +7,12 @@ import './EditTask.css'
 export default function EditTask() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { editTask,  users, fetchTasksForAdmin } = useApi();
+  const { editTask,  users } = useApi();
 
   // Get task from location state
   const task = location.state?.task;
-  const user = location.state?.user;
+  const userId = location.state?.userId;
+  const selectedDate = location.state.date;
   const [title, setTitle] = useState("");
   const [frequency, setFrequency] = useState("");
   const [date, setDate] = useState("");
@@ -82,8 +83,7 @@ export default function EditTask() {
     };
 
     try {
-      await editTask(updatedTask,user);
-      fetchTasksForAdmin();
+      await editTask(updatedTask, userId, selectedDate);
     } catch (error) {
       console.error(error);
     }

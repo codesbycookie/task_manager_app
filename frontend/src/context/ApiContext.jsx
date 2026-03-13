@@ -366,6 +366,9 @@ export function ApiProvider({ children }) {
         { tasks: orderedTaskStatusIds, date },
         { admin_uid: adminUidRef.current }
       );
+      
+      toast.success("Tasks reordered successfully");
+      
     } catch (err) {
       handleApiError(err);
     }

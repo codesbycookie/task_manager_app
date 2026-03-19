@@ -34,6 +34,15 @@ const toLocalDate = (d) => {
   return new Date(d);
 };
 
+// ✅ Format date as YYYY-MM-DD in LOCAL time — never use toISOString() for dates
+// toISOString() converts to UTC which shifts date back by 5:30hrs in IST
+const toLocalDateString = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
 const isSameDate = (d1, d2) => {
   const a = toLocalDate(d1);
   const b = toLocalDate(d2);
@@ -79,14 +88,13 @@ const getDaysInMonth = (date) => {
 // ─── SortableRow ──────────────────────────────────────────────────────────────
 
 function SortableRow({ sheet, idx, handleEdit, handleDeleteClick }) {
-  // ✅ sheet.status._id is the TaskStatus _id — single source of truth
   const id = String(sheet.status._id);
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id });
 
   const style = {
-    transform: CSS.Translate.toString(transform), // Translate avoids scale distortion on <tr>
+    transform: CSS.Translate.toString(transform),
     transition,
     willChange: "transform",
     opacity: isDragging ? 0.4 : 1,
@@ -156,15 +164,14 @@ export default function AdminSheets() {
   const navigate = useNavigate();
   const { deleteTask, fetchTasksForAdmin, tasks, sheetUser, reorderTasks } = useApi();
 
-  const { loading  } = useLoading();
-
+  const { loading } = useLoading();
 
   const [showModal, setShowModal] = useState(false);
   const [taskList, setTaskList] = useState([]);
   const [selectedSheet, setSelectedSheet] = useState(null);
   const [selectedDayIndex, setSelectedDayIndex] = useState(new Date().getDay());
   const [selectedDate, setSelectedDate] = useState(
-    () => new Date().toISOString().split("T")[0]
+    () => toLocalDateString(new Date())  // ✅ fixed: was new Date().toISOString().split("T")[0]
   );
   const [statusFilter, setStatusFilter] = useState("all");
 
@@ -188,12 +195,10 @@ export default function AdminSheets() {
     fetchTasksForAdmin(userId, selectedDate);
   }, [userId, selectedDate]); // eslint-disable-line react-hooks/exhaustive-deps
 
-
-  // In AdminSheets — clear the guard on mount so back-navigation always refetches
+  // Clear the guard on mount so back-navigation always refetches
   useEffect(() => {
     lastFetchedRef.current = { userId: null, date: null };
-  }, []); // runs once on mount
-
+  }, []);
 
   // ✅ Force refetch helper — resets the guard then fetches
   const forceRefetch = () => {
@@ -201,21 +206,27 @@ export default function AdminSheets() {
     fetchTasksForAdmin(userId, selectedDate);
   };
 
+  // ✅ fixed: was date.toISOString().split("T")[0]
   const handleDateClick = (date) => {
-    setSelectedDate(date.toISOString().split("T")[0]);
+    setSelectedDate(toLocalDateString(date));
     setSelectedDayIndex(date.getDay());
   };
 
+  // ✅ fixed: was new Date(...).toISOString().split("T")[0]
   const goToPreviousMonth = () => {
     const d = toLocalDate(selectedDate);
-    setSelectedDate(new Date(d.getFullYear(), d.getMonth() - 1, 1).toISOString().split("T")[0]);
+    setSelectedDate(toLocalDateString(new Date(d.getFullYear(), d.getMonth() - 1, 1)));
   };
+
+  // ✅ fixed: was new Date(...).toISOString().split("T")[0]
   const goToNextMonth = () => {
     const d = toLocalDate(selectedDate);
-    setSelectedDate(new Date(d.getFullYear(), d.getMonth() + 1, 1).toISOString().split("T")[0]);
+    setSelectedDate(toLocalDateString(new Date(d.getFullYear(), d.getMonth() + 1, 1)));
   };
+
+  // ✅ fixed: was new Date().toISOString().split("T")[0]
   const goToToday = () => {
-    setSelectedDate(new Date().toISOString().split("T")[0]);
+    setSelectedDate(toLocalDateString(new Date()));
   };
 
   const handleEdit = (task) => {
@@ -231,17 +242,15 @@ export default function AdminSheets() {
 
   const confirmDelete = async () => {
     try {
-      // ✅ sheet.status._id is the TaskStatus _id
       await deleteTask(selectedSheet.status._id, userId, selectedDate);
       setShowModal(false);
       setSelectedSheet(null);
-      forceRefetch(); // ✅ refresh after delete
+      forceRefetch();
     } catch (err) {
       console.error("Error deleting task:", err);
     }
   };
 
-  // ✅ Backend already returns resolved statuses — just apply statusFilter client-side
   const filteredTasks = useMemo(() => {
     if (!tasks) return [];
     if (statusFilter === "all") return tasks;
@@ -256,7 +265,6 @@ export default function AdminSheets() {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    // ✅ Match by sheet.status._id (stringified) — same as useSortable id
     const oldIndex = taskList.findIndex((t) => String(t.status._id) === active.id);
     const newIndex = taskList.findIndex((t) => String(t.status._id) === over.id);
     if (oldIndex === -1 || newIndex === -1) return;
@@ -264,7 +272,6 @@ export default function AdminSheets() {
     const newList = arrayMove(taskList, oldIndex, newIndex);
     setTaskList(newList);
 
-    // ✅ Send TaskStatus _ids in new order with date
     const orderedIds = newList.map((item) => item.status._id);
     await reorderTasks(userId, orderedIds, selectedDate);
   };
@@ -433,7 +440,6 @@ export default function AdminSheets() {
                       <th className="pe-4 text-end">Actions</th>
                     </tr>
                   </thead>
-                  {/* ✅ items use String(sheet.status._id) — matches useSortable id */}
                   <SortableContext
                     items={taskList.map((t) => String(t.status._id))}
                     strategy={verticalListSortingStrategy}

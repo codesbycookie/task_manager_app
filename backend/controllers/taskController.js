@@ -43,12 +43,14 @@ const resolveTaskStatusesForDate = async (userId, targetDate) => {
   const dayName   = start.toLocaleDateString('en-US', { weekday: 'long' });
   const dayNumber = start.getDate();
 
-  // Fetch existing statuses for this date
   let taskStatuses = await TaskStatus
     .find({ user: userId, date: { $gte: start, $lte: end } })
     .populate('task')
     .populate('user')
     .sort({ priority: 1 });
+
+  // ✅ Filter out orphaned TaskStatus records (task was deleted but status remains)
+  taskStatuses = taskStatuses.filter((s) => s.task != null);
 
   const statusMap = new Map(taskStatuses.map((s) => [s.task._id.toString(), s]));
 
@@ -148,20 +150,35 @@ const addTask = async (req, res) => {
     const task = new Task({ title, description, frequency, days, dates, date, users_assigned, branch });
     await task.save();
 
-    const today = normalizeDate();
+    const today       = normalizeDate();
+    const todayName   = today.toLocaleDateString('en-US', { weekday: 'long' }); // e.g. "Monday"
+    const todayNumber = today.getDate();
 
-    // ✅ New task — no previous record exists, just append at end of today's list
-    const taskStatusEntries = await Promise.all(
-      users_assigned.map(async (userId) => ({
-        user:     userId,
-        task:     task._id,
-        date:     today,
-        status:   'not completed',
-        priority: await getNextPriority(userId, today),
-      }))
-    );
+    // ✅ Check if task is actually due today based on its frequency
+    const isDueToday = (() => {
+      if (frequency === 'daily') return true;
+      if (frequency === 'weekly')  return days.includes(todayName);
+      if (frequency === 'monthly') return dates.includes(todayNumber);
+      if (frequency === 'once') {
+        const taskDate = normalizeDate(date);
+        return taskDate.getTime() === today.getTime();
+      }
+      return false;
+    })();
 
-    await TaskStatus.insertMany(taskStatusEntries);
+    // ✅ Only create TaskStatus for today if task is actually due today
+    if (isDueToday) {
+      const taskStatusEntries = await Promise.all(
+        users_assigned.map(async (userId) => ({
+          user:     userId,
+          task:     task._id,
+          date:     today,
+          status:   'not completed',
+          priority: await getNextPriority(userId, today),
+        }))
+      );
+      await TaskStatus.insertMany(taskStatusEntries);
+    }
 
     res.status(201).json({ message: 'Task created successfully', task });
   } catch (err) {
@@ -207,39 +224,19 @@ const deleteTask = async (req, res) => {
     if (!isValidId(taskStatusId))
       return res.status(400).json({ message: 'Valid TaskStatus ID is required.' });
 
-    const deleted = await TaskStatus.findByIdAndDelete(taskStatusId).populate('task');
-    if (!deleted)
+    const taskStatus = await TaskStatus.findById(taskStatusId);
+    if (!taskStatus)
       return res.status(404).json({ message: 'TaskStatus not found.' });
 
-    // Re-sequence priorities for this user on the same day
-    const start = normalizeDate(deleted.date);
-    const end   = getEndOfDay(deleted.date);
+    const taskId = taskStatus.task;
 
-    const remaining = await TaskStatus
-      .find({ user: deleted.user, date: { $gte: start, $lte: end } })
-      .sort({ priority: 1 });
+    // ✅ Delete the Task document itself
+    const task = await Task.findByIdAndDelete(taskId);
 
-    if (remaining.length > 0) {
-      await TaskStatus.bulkWrite(
-        remaining.map((t, i) => ({
-          updateOne: {
-            filter: { _id: t._id },
-            update: { $set: { priority: i + 1 } }, // ✅ was missing $set
-          },
-        }))
-      );
-    }
+    // ✅ Delete ALL TaskStatus records for this task (all users, all dates)
+    await TaskStatus.deleteMany({ task: taskId });
 
-    // Remove user from task's users_assigned
-    const task = await Task.findById(deleted.task._id);
-    if (task) {
-      task.users_assigned = task.users_assigned.filter(
-        (uid) => uid.toString() !== deleted.user.toString()
-      );
-      await task.save();
-    }
-
-    res.status(200).json({ message: 'Task deleted successfully', task: deleted.task });
+    res.status(200).json({ message: 'Task deleted successfully', task });
   } catch (err) {
     console.error('[deleteTask]', err);
     res.status(500).json({ message: 'Server Error', error: err.message });
